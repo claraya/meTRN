@@ -1,0 +1,68 @@
+#!/usr/bin/sh
+
+
+# Launch TF binding signal analyses near TSSs (WS220):
+#python mapProfile.py --path ~/meTRN --organism ce --mode signal --group regulation --peaks ce_selection_com_cx_raw --name ce_wormbased_TSS_gx --window 1000 --source annotations --infile in2shape_ce_wormbased_TSS_gx.bed  --strand ON --cutChr ON --chunks 1 --overwrite OFF
+#python mapProfile.py --path ~/meTRN --organism ce --mode matrix --group regulation --peaks ce_selection_com_cx_raw --name ce_wormbased_TSS_gx --window 1000 --target factor.context --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6
+#python mapProfile.py --path ~/meTRN --organism ce --mode deltas --group regulation --peaks ce_selection_com_cx_raw --name ce_wormbased_TSS_gx --window 1000 --target factor.context --metric signal.rng
+
+
+# Launch TF binding signal analyses near EM and L3 TSSs (Waterston Lab):
+#python mapProfile.py --path ~/meTRN --organism ce --mode signal --group regulation --peaks ce_selection_pol_ex_raw --name ce_modencode_TSS_ex --window 1000 --source annotations --infile in2shape_ce_modencode_TSS_ee.bed  --strand ON --cutChr ON --chunks 1 --overwrite OFF --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6
+#python mapProfile.py --path ~/meTRN --organism ce --mode signal --group regulation --peaks ce_selection_pol_l3_raw --name ce_modencode_TSS_l3 --window 1000 --source annotations --infile in2shape_ce_modencode_TSS_l3.bed  --strand ON --cutChr ON --chunks 1 --overwrite OFF --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6
+
+#python mapProfile.py --path ~/meTRN --organism ce --mode matrix --group regulation --peaks ce_selection_pol_ex_raw --name ce_modencode_TSS_ex --window 1000 --target factor.context --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6
+#python mapProfile.py --path ~/meTRN --organism ce --mode matrix --group regulation --peaks ce_selection_pol_l3_raw --name ce_modencode_TSS_l3 --window 1000 --target factor.context --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6
+
+
+# Launch TF binding signal analyses near CapSeq/CIP-TAP TSSs (Gu et al. 2012, Cell):
+#python mapProfile.py --path ~/meTRN --organism ce --mode signal --group regulation --peaks ce_selection_com_cx_raw --name ce_gu2012pro_TSS_gx --window 1000 --source annotations --infile in2shape_ce_gu2012pro_TSS_gx.bed  --strand ON --cutChr ON --chunks 1 --overwrite OFF --precision 3 --multiarray OFF
+#python mapProfile.py --path ~/meTRN --organism ce --mode matrix --group regulation --peaks ce_selection_com_cx_raw --name ce_gu2012pro_TSS_gx --window 1000 --target factor.context --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6
+#python mapProfile.py --path ~/meTRN --organism ce --mode deltas --group regulation --peaks ce_selection_com_cx_raw --name ce_gu2012pro_TSS_gx --window 1000 --target factor.context --metric signal.rng
+#python mapProfile.py --path ~/meTRN --organism ce --mode ratios --group regulation --peaks ce_selection_com_cx_raw --name ce_gu2012pro_TSS_gx --window 1000 --target factor.context --metric signal.rng
+
+
+# Import chromatin signal files to bedGraph:
+#python mapProfile.py --path ~/meTRN --organism ce --mode import --group chromatin --source extras/chromatin/ce/ee/fold --overwrite OFF --rename DPL1:DPL-1,DPY27:DPY-27,EFL1:EFL-1,EPC1:EPC-1,HDA1:HDA-1,HPL2:HPL-2,LET418:LET-418,LIN35:LIN-35,LIN37:LIN-37,LIN52:LIN-52,LIN54:LIN-54,LIN61:LIN-61,LIN9:LIN-9,NURF1:NURF-1,MRG1:MRG-1,RPC1:RPC-1,PolII:AMA-1
+
+#python mapProfile.py --path ~/meTRN --organism ce --mode import --group chromatin --source extras/chromatin/ce/l3/fold --overwrite OFF --rename DPL1:DPL-1,DPY27:DPY-27,EFL1:EFL-1,EPC1:EPC-1,HDA1:HDA-1,HPL2:HPL-2,LET418:LET-418,LIN35:LIN-35,LIN37:LIN-37,LIN52:LIN-52,LIN54:LIN-54,LIN61:LIN-61,LIN9:LIN-9,NURF1:NURF-1,MRG1:MRG-1,RPC1:RPC-1,PolII:AMA-1
+
+
+# Launch chromatin signal analyses near TSSs:
+#python mapProfile.py --path ~/meTRN --organism ce --mode signal --group chromatin --name ce_chromatin_TSS_gx --window 1000 --source annotations --infile in2shape_ce_wormbased_TSS_gx.bed --strand ON --cutChr ON --chunks 1 --overwrite OFF
+#python mapProfile.py --path ~/meTRN --organism ce --mode matrix --group chromatin --name ce_chromatin_TSS_gx --window 1000 --target factor.context --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6
+
+
+# Cluster TF binding signals in select examples:
+#python mapProfile.py --path ~/meTRN --organism ce --mode cluster --name ce_wormbased_TSS_gx --infile mapprofile_signal_N2_POL2_L2_yale_stn.fc.signal.txt --target factor.context
+
+
+# Launch TF binding signal for target datasets:
+#python mapProfile.py --path ~/meTRN --organism ce --mode depths --peaks ce_selection_com_cx_raw --name ce_regionals_HAM_gx --window in2shape_ce_intervals_500_gx.bed --overwrite OFF --include BLMP-1 --exclude GFP --nuclear OFF --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6,RPC-15:RPC-1,DCC4640_LIN-35:DCC4640_EFL-1,DCC_HPL-2:SDQ2340_HPL-2,DCC_HDA-1:SDQ2354_HDA-1
+#python mapProfile.py --path ~/meTRN --organism ce --mode depths --peaks ce_selection_com_cx_raw --name ce_regionals_HAM_gx --window in2shape_ce_intervals_500_gx.bed --overwrite OFF --include HAM-1 --exclude GFP --nuclear OFF --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6,RPC-15:RPC-1,DCC4640_LIN-35:DCC4640_EFL-1,DCC_HPL-2:SDQ2340_HPL-2,DCC_HDA-1:SDQ2354_HDA-1
+#python mapProfile.py --path ~/meTRN --organism ce --mode depths --peaks ce_selection_com_cx_raw --name ce_regionals_HAM_gx --window in2shape_ce_intervals_500_gx.bed --overwrite OFF --include MEP-1 --exclude GFP --nuclear OFF --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6,RPC-15:RPC-1,DCC4640_LIN-35:DCC4640_EFL-1,DCC_HPL-2:SDQ2340_HPL-2,DCC_HDA-1:SDQ2354_HDA-1
+#python mapProfile.py --path ~/meTRN --organism ce --mode depths --peaks ce_selection_com_cx_raw --name ce_regionals_HAM_gx --window in2shape_ce_intervals_500_gx.bed --overwrite OFF --include AMA-1 --exclude POL,YL --nuclear OFF --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6,RPC-15:RPC-1,DCC4640_LIN-35:DCC4640_EFL-1,DCC_HPL-2:SDQ2340_HPL-2,DCC_HDA-1:SDQ2354_HDA-1
+
+
+# Launch copy-number analysis for target datasets:
+#python mapProfile.py --path ~/meTRN --organism ce --mode cnvseq --peaks ce_selection_com_cx_raw --name ce_regionals_HAM_gx --threshold 1 --target mapprofile_depths_OP109_BLMP-1_L1_yale_stn_1_DNA_a_091208_ROCKFORD_FC434NY_6_CATT_q30.hit --source mapprofile_depths_N2_AMA-1_L1_yale_stn_2_DNA_a_FC42TM3HM_20090928_3_CATT_q30.hit
+#python mapProfile.py --path ~/meTRN --organism ce --mode cnvseq --peaks ce_selection_com_cx_raw --name ce_regionals_HAM_gx --threshold 1 --target mapprofile_depths_OP102_HAM-1_L1_yale_stn_1_DNA_a_100716_ROCKFORD_FC624GH_3_GTAT_q30.hit --source mapprofile_depths_N2_AMA-1_L1_yale_stn_2_DNA_a_FC42TM3HM_20090928_3_CATT_q30.hit
+#python mapProfile.py --path ~/meTRN --organism ce --mode cnvseq --peaks ce_selection_com_cx_raw --name ce_regionals_HAM_gx --threshold 1 --target mapprofile_depths_OP70_MEP-1_EM_yale_stn_2_DNA_a_FC43095HM_20091024_2_TGCT_q30.hit --source mapprofile_depths_N2_AMA-1_L1_yale_stn_2_DNA_a_FC42TM3HM_20090928_3_CATT_q30.hit
+
+
+# Examine unmapped reads for evidence of a GFP fusion protein (OP102 data):
+#python mapProfile.py --path ~/meTRN --organism ce --mode parser --peaks ce_selection_com_cx_raw --name ce_regionals_HAM_gx --overwrite OFF --include OP102_HAM-1_L1 --exclude GFP --nuclear OFF --source extras --infile HAM-1xGFP-left.fasta --track ATTGGTATGCACTTC
+
+
+# Collect OP102 strain reads, build genome indexm and align reads to the MEP-1:GFP fusion construct:
+#cat 100716_ROCKFORD_FC624GH_L3_GTAT_pf.fastq 100716_ROCKFORD_FC624GH_L3_CATT_pf.fastq 110517_SPADE_00075_FC70M43_L6_GTAT_pf.fastq 110517_SPADE_00075_FC70M43_L6_CATT_pf.fastq > ~/meTRN/extras/geneious/OP102_HAM-1_LX_yale_X_DNA_reads.fastq
+#bwa index ceTRN_MEP-1-gfp.fasta
+#bwa aln -I -t 6 ceTRN_MEP-1-gfp.fasta OP102_HAM-1_LX_yale_X_DNA_reads.fastq > ceTRN_MEP-1-gfp.sai
+#bwa samse -n 1 ceTRN_MEP-1-gfp.fasta ceTRN_MEP-1-gfp.sai OP102_HAM-1_LX_yale_X_DNA_reads.fastq > ceTRN_MEP-1-gfp.sam
+#samtools view -S -q 30 -o ceTRN_MEP-1-gfp_q30.sam ceTRN_MEP-1-gfp.sam
+#samtools view -S -q 30 -b -o ceTRN_MEP-1-gfp_q30.sam ceTRN_MEP-1-gfp.bam
+
+
+
+#top
+#bash runMaster8A.sh
