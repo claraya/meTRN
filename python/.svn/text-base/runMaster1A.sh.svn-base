@@ -9,11 +9,14 @@
 #python mapData.py --path ~/meTRN/ --mode paralogs --source extras --infile modencode.family.common.report.txt
 
 
+<<<<<<< HEAD
 # Make genomic windows:
 #python in2shape.py --path ~/meTRN --organism ce --mode intervals --name ce_intervals_500_gx --parameters 500 --nuclear OFF
 #python in2shape.py --path ~/meTRN --organism ce --mode intervals --name ce_intervals_1kb_gx --parameters 1000 --nuclear OFF
 
 
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 # Prepare worm expression annotations:
 #python in2shape.py --path ~/meTRN --organism ce --infile waterston_EE_N2_EE-2.integrated_transcripts.v1203f.ws220.gff3 --folder extras --mode waterston:expression --name ce_expressed_RNA_ee
 #python in2shape.py --path ~/meTRN --organism ce --infile waterston_LE_N2_LE-1.integrated_transcripts.v1203f.ws220.gff3 --folder extras --mode waterston:expression --name ce_expressed_RNA_le
@@ -70,6 +73,7 @@
 #python in2shape.py --path ~/meTRN --organism ce --infile kHMM/k562.ChromHMM.bed --folder extras --mode import --name hs_modencode_KMM_k5 --cutChr OFF
 
 
+<<<<<<< HEAD
 # Prepare worm TSS annotation files (and adjust them):
 #python in2shape.py --path ~/meTRN --organism ce --infile wormbase_ws220_annotations.gff --folder extras --mode wormbase:tss --name ce_wormbased_TSS_gx
 #python in2shape.py --path ~/meTRN --organism ce --infile in2shape_ce_wormbased_TSS_gx --folder annotations --mode slopbed --name ce_wormbased_TSS_gx --parameters "-l 5000 -r 500 -s"
@@ -85,6 +89,15 @@
 
 
 # Prepare fly TSS annotation files (and adjust them):
+=======
+# Prepare species TSS annotation files (and adjust them):
+#python in2shape.py --path ~/meTRN --organism hs --infile Gencodev10_TSS_May2012.gff --folder extras --mode gff2bed --name hs_modencode_TSS_gx
+#python in2shape.py --path ~/meTRN --organism hs --infile in2shape_hs_modencode_TSS_gx --folder annotations --mode slopbed --name hs_TSS_modencode_TSS_gx --parameters "-l 5000 -r 500 -s"
+
+#python in2shape.py --path ~/meTRN --organism ce --infile wormbase_ws220_annotations.gff --folder extras --mode wormbase:tss --name ce_wormbased_TSS_gx
+#python in2shape.py --path ~/meTRN --organism ce --infile in2shape_ce_wormbased_TSS_gx --folder annotations --mode slopbed --name ce_wormbased_TSS_gx --parameters "-l 2000 -r 200 -s"
+
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 #python in2shape.py --path ~/meTRN --organism dm --infile Celniker_Drosophila_Annotation_20120616_1428.tss.gtf --folder extras --mode gff2bed --name dm_modencode_TSS_gx --cutChr ON
 #python in2shape.py --path ~/meTRN --organism dm --infile in2shape_dm_modencode_TSS_gx --folder annotations --mode slopbed --name dm_modencode_TSS_gx --parameters "-l 2000 -r 200 -s"
 
@@ -93,9 +106,18 @@
 #python in2shape.py --path ~/meTRN --organism ce --infile gu_2012_table_s1b.txt --folder extras --mode gu2012:all --name ce_gu2012all_TSS_gx
 #python in2shape.py --path ~/meTRN --organism ce --infile gu_2012_table_s1b.txt --folder extras --mode gu2012:pro --name ce_gu2012pro_TSS_gx
 
+<<<<<<< HEAD
 #python in2shape.py --path ~/meTRN --organism ce --infile in2shape_ce_gu2012all_TSS_gx --folder annotations --mode slopbed --name ce_gu2012all_TSS_gx --parameters "-l 2000 -r 200 -s"
 #python in2shape.py --path ~/meTRN --organism ce --infile in2shape_ce_gu2012pro_TSS_gx --folder annotations --mode slopbed --name ce_gu2012pro_TSS_gx --parameters "-l 2000 -r 200 -s"
 
+=======
+
+# Generate extended promoter regions in worm:
+#python in2shape.py --path ~/meTRN --organism ce --infile in2shape_ce_wormbased_TSS_gx --folder annotations --mode slopbed --name ce_wormbased_TSS_gx --parameters "-l 5000 -r 500 -s"
+#python in2shape.py --path ~/meTRN --organism ce --infile in2shape_ce_wormbased_TSS_gx --folder annotations --mode slopbed --name ce_wormbased_TSS_gx --parameters "-l 4000 -r 400 -s"
+#python in2shape.py --path ~/meTRN --organism ce --infile in2shape_ce_wormbased_TSS_gx --folder annotations --mode slopbed --name ce_wormbased_TSS_gx --parameters "-l 3000 -r 300 -s"
+#python in2shape.py --path ~/meTRN --organism ce --infile in2shape_ce_wormbased_TSS_gx --folder annotations --mode slopbed --name ce_wormbased_TSS_gx --parameters "-l 1000 -r 100 -s"
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 
 # Prepare species TSS annotation files (with feature names):
 #python in2shape.py --path ~/meTRN --organism hs --infile Gencodev10_TSS_May2012.gff --folder extras --mode gencode:tss --name hs_gencode10_TSS_gx
@@ -196,6 +218,11 @@
 #python in2shape.py --path ~/meTRN --organism hs --folder annotations --mode regulatory.mix --infile in2shape_hs_modencode_TSS_gx_windows_500bp.bed --parameters in2shape_hs_modencode_DHS_k5_slopbed_up500_dn500.bed --name hs_modencode_MIX_k5 --target window
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 # Generate promoter regions for expressed and repressed genes:
 #python in2shape.py --path ~/meTRN --infile in2shape_ce_expressed_TSS_ee.bed --folder annotations --mode slopbed --name ce_expressed_TSS_ee --organism ce --parameters "-l 2000 -r 200 -s"
 #python in2shape.py --path ~/meTRN --infile in2shape_ce_repressed_TSS_ee.bed --folder annotations --mode slopbed --name ce_repressed_TSS_ee --organism ce --parameters "-l 2000 -r 200 -s"

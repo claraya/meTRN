@@ -315,9 +315,15 @@ def main():
 	parser.add_option("--nuclear", action = "store", type = "string", dest = "nuclear", help = "Peaks are only nuclear?", default="ON")
 	parser.add_option("--expression", action="store", type="string", dest="expression", help="Input expression file for abundance representation", default="OFF")
 	parser.add_option("--pedigree", action="store", type="string", dest="pedigree", help="Input pedigree file", default="OFF")
+<<<<<<< HEAD
 	parser.add_option("--mapping", action="store", type="string", dest="mapping", help="Input mapping file; associates tissue labels to more generic terms!", default="OFF")
 	parser.add_option("--tissues", action="store", type="string", dest="tissues", help="Input tissues file", default="OFF")
 	parser.add_option("--times", action="store", type="string", dest="times", help="Input cell times file", default="OFF")
+=======
+	parser.add_option("--tissues", action="store", type="string", dest="tissues", help="Input tissues file", default="OFF")
+	parser.add_option("--times", action="store", type="string", dest="times", help="Input cell times file", default="OFF")
+	parser.add_option("--mapping", action="store", type="string", dest="mapping", help="Input mapping file; associates tissue labels to more generic terms!", default="OFF")
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 	parser.add_option("--name", action="store", type="string", dest="name", help="Output file name", default="")
 	parser.add_option("--nametag", action="store", type="string", dest="nametag", help="Output file name addition tag", default="")
 	parser.add_option("--collection", action="store", type="string", dest="collection", help="Cell collection subset name", default="OFF")
@@ -668,6 +674,7 @@ def main():
 		f_output.close()
 	
 	
+<<<<<<< HEAD
 	# simplify cell annotations :
 	elif option.mode == "simply":
 		
@@ -803,6 +810,53 @@ def main():
 				"na" : "other"
 				}
 			
+=======
+	# import mode:
+	elif option.mode == "import":
+		
+		# Tissue labels are organised from specific-to-generic as follows:
+		# specificDict:  cell > specific tissue
+		# generalDict: specific tissue > general tissue
+		# classDict:   general tissue > class tissue (tissue class)
+		
+		# construct tissue dictionary (if necessary):
+		if option.tissues != "OFF" and option.mapping != "OFF":
+			
+			print
+			print "Loading general and specific tissue information..."
+			specificDict, specificTotal, specificMissing = dict(), list(), 0
+			generalDict, generalTotal, generalMissing = dict(), list(), 0
+			tslines = open(extraspath + option.tissues).read().replace("\r","\n").split("\n")
+			inlines = open(extraspath + option.mapping).read().replace("\r","\n").split("\n")
+			specificHeader = inlines.pop(0)
+			for inline in inlines:
+				if inline.strip() != "":
+					regExp, generalTissue = inline.strip().split(",")
+					generalTissue = generalTissue.strip().lower()
+					specificHits = list()
+					for tsline in tslines:
+						if tsline.strip() != "":
+							cell, specificTissue = tsline.strip().split(", ")
+							if re.match(regExp, specificTissue):
+								specificTissue = specificTissue.strip().lower()
+								specificDict[cell] = specificTissue
+								generalDict[cell] = generalTissue
+								#print " : ".join([cell, specificTissue, generalTissue, regExp])
+								#pdb.set_trace()
+								specificTotal.append(specificTissue)
+								generalTotal.append(generalTissue)
+			specificTotal = sorted(list(set(specificTotal)))	
+			generalTotal = sorted(list(set(generalTotal)))	
+			
+			print "Generating tissue classes..."
+			classification = {
+				"neuron" : "neuron/glial",
+				"pharynx" : "pharynx",
+				"intestine" : "intestine/excretory",
+				"intesto" : "intestine/excretory",
+				"execretory" : "intestine/excretory"
+				}
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 			classDict, classTotal, classMissing = dict(), list(), 0
 			for cell in generalDict:
 				generalTissue = generalDict[cell]
@@ -896,6 +950,7 @@ def main():
 		cell_dict, parent_dict, pedigreeCells = relationshipBuilder(pedigreefile=option.pedigree, path=extraspath, mechanism="simple")
 		
 		# construct tissue dictionary (if necessary):
+<<<<<<< HEAD
 		if option.tissues != "OFF":
 			
 			print
@@ -1007,6 +1062,69 @@ def main():
 						matchExpansion.append(matchTissue)
 			
 			# record counts for each type of tissue:
+=======
+		if option.tissues != "OFF" and option.mapping != "OFF":
+			
+			print
+			print "Expanding cell tissue information..."
+			multipleDict = dict()
+			matchExpansion, matchTotal, matchMissing = list(), 0, 0
+			for cell in pedigreeCells:
+				multipleDict[cell] = ""
+				if not cell in specificDict:
+	
+					# Find most closely-related, annotated cell (and use its associated tissue annotation):
+					minQuery, queryDict, queryCells, matchCells, matchTissues = 100, dict(), list(), list(), list()
+					for queryCell in specificDict:
+						if cell == queryCell[:len(cell)] or queryCell == cell[:len(queryCell)]:
+							queryCells.append(queryCell)
+					for queryCell in queryCells:
+						if len(queryCell) < minQuery:
+							minQuery = len(queryCell)
+					for queryCell in queryCells:
+						if len(queryCell) == minQuery:
+							matchCells.append(queryCell)
+							queryTissue = specificDict[queryCell]
+							if not queryTissue in matchTissues:
+								matchTissues.append(queryTissue)
+					
+					matchCounts = dict()
+					for matchTissue in matchTissues:
+						matchCounts[matchTissue] = matchTissues.count(matchTissue)
+					matchTissues = general.valuesort(matchCounts)
+					matchTissues.reverse()
+					
+					# Filter tissues associated with father/daughter cells:
+					if len(matchTissues) > 1:
+						matchTissues = general.clean(matchTissues, "death")
+					if len(matchTissues) > 1:
+						matchTissues = general.clean(matchTissues, "other")
+						multipleDict[cell] = "*"
+					matchTotal += 1
+					
+					# Generate and store specific tissue label for cell:
+					if len(matchTissues) == 0:
+						matchMissing += 1
+						matchTissue = "other"
+					else:
+						matchTissue = matchTissues[0]
+					specificDict[cell] = matchTissue
+					
+					
+					# Store matches for general and class tissues:
+					if len(matchCells) == 0:
+						generalDict[cell] = "other"
+						classDict[cell] = "other"
+					else:
+						matchCell = matchCells[0]
+						generalDict[cell] = generalDict[matchCell]
+						classDict[cell] = classDict[matchCell]
+					
+					# Update/expand cell-tissue dictionary:
+					if not matchTissue in matchExpansion:
+						matchExpansion.append(matchTissue)
+			
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 			specificCounts, generalCounts, classCounts = dict(), dict(), dict()
 			for cell in specificDict:
 				specificTissue = specificDict[cell]
@@ -1046,6 +1164,11 @@ def main():
 			print
 			print "Tissue information expanded by:", len(matchExpansion)
 			print "Tissue information expansion terms:", ", ".join(list(sorted(matchExpansion)))
+<<<<<<< HEAD
+=======
+			print "Specific tissues missed (converted to other):", matchMissing, "(total:", matchTotal, ")"
+			print "General tissues missed (converted to other):", generalMissing, "(total:", len(generalTotal), ")"
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 			#pdb.set_trace()
 
 		# calculate unique expression values for each gene/cell combination:
@@ -1054,10 +1177,17 @@ def main():
 		matrix, expression, expressing = dict(), dict(), dict()
 		for gene in gene2cell_dict:
 			for cell in gene2cell_list[gene]:
+<<<<<<< HEAD
 				values, maxSeries, maxValue = list(), "NA", 0
 				for series in gene2cell_dict[gene][cell]:
 					values.append(gene2cell_dict[gene][cell][series])
 					if gene2cell_dict[gene][cell][series] >= maxValue:
+=======
+				values, maxSeries, maxValue = list(), "", 0
+				for series in gene2cell_dict[gene][cell]:
+					values.append(gene2cell_dict[gene][cell][series])
+					if gene2cell_dict[gene][cell][series] > maxValue:
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 						maxSeries, maxValue = series, gene2cell_dict[gene][cell][series]
 				if not gene in matrix:
 					matrix[gene] = dict()
@@ -1136,9 +1266,12 @@ def main():
 			ascendants = ascendantsCollector(cell, parent_dict, cell_dict, ascendants=list())
 			if cell in trackedCells or len(ascendants) < int(option.ascendants):
 				startedCells.append(cell)
+<<<<<<< HEAD
 				#if cell == "ABalaaaal":
 				#	print cell, specificDict[cell], generalDict[cell], classDict[cell]
 				#	pdb.set_trace()
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		print "Ascendants cutoff:", cutAscendants
 		
 		# define output files:
@@ -1150,9 +1283,15 @@ def main():
 		tissuesfile = expressionpath + "mapcells_" + expression_flag + option.name + "_expression_tissues"
 		
 		# define cellular expression header:
+<<<<<<< HEAD
 		expressionHeader = ["cell", "cell.name", "gene", "cell.expression", "peak.expression", "fraction.expression", "normal.expression", "rank", "max.expression", "avg.expression", "med.expression", "std.expression", "cells.expressing", "cells.count", "series.count", "time.series", "max.series", "specific.tissue", "general.tissue", "class.tissue", "match.tissue"]
 		reportHeader = ["gene", "cells.expressing", "cells.assayed", "cells.tracked", "cell.expression", "peak.expression", "fraction.expression", "series.count", "time.series", "max.series"]
 		tissueHeader = ["cell", "specific.tissue", "general.tissue", "class.tissue", "match.tissue"]
+=======
+		expressionHeader = ["cell", "cell.name", "gene", "cell.expression", "peak.expression", "fraction.expression", "normal.expression", "rank", "max.expression", "avg.expression", "med.expression", "std.expression", "cells.expressing", "cells.count", "series.count", "time.series", "max.series", "multiple.tissue", "specific.tissue", "general.tissue", "class.tissue"]
+		reportHeader = ["gene", "cells.expressing", "cells.assayed", "cells.tracked", "cell.expression", "peak.expression", "fraction.expression", "series.count", "time.series", "max.series"]
+		tissueHeader = ["cell","multiple.tissue", "specific.tissue", "general.tissue", "class.tissue"]
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		
 		# create output files:
 		a_output = open(assayedfile, "w")
@@ -1204,6 +1343,7 @@ def main():
 			cellValues, fracValues = list(), list()
 			for cell in sorted(matrix[gene].keys()):
 				if option.tissues == "OFF" or not cell in specificDict:
+<<<<<<< HEAD
 					specificTissue = "*"
 					generalTissue = "*"
 					classTissue = "*"
@@ -1221,6 +1361,25 @@ def main():
 					print >>t_output, "\t".join(map(str, [cell, cell, gene, cellValue, peakValue, fracValue, float(cellValue)/maxTracked[gene], cellRank, maxValue, meanValue, medianValue, stdValue, cellsExpressingTracked, cellsTracked, seriesCount, seriesIDs, maxSeries, specificTissue, generalTissue, classTissue, matchTissue]))
 				if cell in focusedCells:
 					print >>f_output, "\t".join(map(str, [cell, cell, gene, cellValue, peakValue, fracValue, float(cellValue)/maxFocused[gene], cellRank, maxValue, meanValue, medianValue, stdValue, cellsExpressingFocused, cellsFocused, seriesCount, seriesIDs, maxSeries, specificTissue, generalTissue, classTissue, matchTissue]))
+=======
+					multipleTissue = "*"
+					specificTissue = "*"
+					generalTissue = "*"
+					classTissue = "*"
+				else:
+					multipleTissue = multipleDict[cell]
+					specificTissue = specificDict[cell]
+					generalTissue = generalDict[cell]
+					classTissue = classDict[cell]
+				cellValue, peakValue, fracValue, cellRank, maxValue, meanValue, medianValue, stdValue, seriesCount, seriesIDs, maxSeries = matrix[gene][cell]
+				print >>a_output, "\t".join(map(str, [cell, cell, gene, cellValue, peakValue, fracValue, float(cellValue)/maxAssayed[gene], cellRank, maxValue, meanValue, medianValue, stdValue, cellsExpressingAssayed, cellsAssayed, seriesCount, seriesIDs, maxSeries, multipleTissue, specificTissue, generalTissue, classTissue]))
+				if cell in startedCells:
+					print >>s_output, "\t".join(map(str, [cell, cell, gene, cellValue, peakValue, fracValue, float(cellValue)/maxStarted[gene], cellRank, maxValue, meanValue, medianValue, stdValue, cellsExpressingTracked, cellsStarted, seriesCount, seriesIDs, maxSeries, multipleTissue, specificTissue, generalTissue, classTissue]))
+				if cell in trackedCells:
+					print >>t_output, "\t".join(map(str, [cell, cell, gene, cellValue, peakValue, fracValue, float(cellValue)/maxTracked[gene], cellRank, maxValue, meanValue, medianValue, stdValue, cellsExpressingTracked, cellsTracked, seriesCount, seriesIDs, maxSeries, multipleTissue, specificTissue, generalTissue, classTissue]))
+				if cell in focusedCells:
+					print >>f_output, "\t".join(map(str, [cell, cell, gene, cellValue, peakValue, fracValue, float(cellValue)/maxFocused[gene], cellRank, maxValue, meanValue, medianValue, stdValue, cellsExpressingFocused, cellsFocused, seriesCount, seriesIDs, maxSeries, multipleTissue, specificTissue, generalTissue, classTissue]))
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 				if fracValue >= option.fraction and cellValue >= option.minimum:
 					cellValues.append(cellValue)
 					fracValues.append(fracValue)
@@ -1228,6 +1387,7 @@ def main():
 			
 		# export tissue annotations:
 		print "Exporting tissue annotation data..."
+<<<<<<< HEAD
 		print "Annotated cells:", len(specificDict)
 		for cell in sorted(specificDict.keys()):
 			specificTissue = specificDict[cell]
@@ -1239,6 +1399,16 @@ def main():
 				matchTissue = str(classTissue)
 			print >>x_output, "\t".join([cell, specificTissue, generalTissue, classTissue, matchTissue])
 	
+=======
+		for cell in sorted(specificDict.keys()):
+			multipleTissue = multipleDict[cell]
+			specificTissue = specificDict[cell]
+			generalTissue = generalDict[cell]
+			classTissue = classDict[cell]
+			print >>x_output, "\t".join([cell, multipleTissue, specificTissue, generalTissue, classTissue])
+	
+		
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		# close output:
 		a_output.close()
 		s_output.close()
@@ -1246,6 +1416,10 @@ def main():
 		f_output.close()
 		r_output.close()
 		x_output.close()
+<<<<<<< HEAD
+=======
+		print
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		
 		print
 		print "Focused cells:", len(focusedCells)
@@ -1276,9 +1450,15 @@ def main():
 		mxleafsfile = expressionpath + "mapcells_" + expression_flag + option.name + "_expression_mxleafs"
 		
 		# define cellular expression header:
+<<<<<<< HEAD
 		expressionHeader = ["cell", "cell.name", "gene", "cell.expression", "peak.expression", "fraction.expression", "normal.expression", "rank", "max.expression", "avg.expression", "med.expression", "std.expression", "cells.expressing", "cells.count", "series.count", "time.series", "max.series", "specific.tissue", "general.tissue", "class.tissue", "match.tissue"]
 		reportHeader = ["gene", "cells.expressing", "cells.assayed", "cells.tracked", "cell.expression", "peak.expression", "fraction.expression", "series.count", "time.series", "max.series"]
 		tissueHeader = ["cell", "specific.tissue", "general.tissue", "class.tissue", "match.tissue"]
+=======
+		expressionHeader = ["cell", "cell.name", "gene", "cell.expression", "peak.expression", "fraction.expression", "normal.expression", "rank", "max.expression", "avg.expression", "med.expression", "std.expression", "cells.expressing", "cells.count", "series.count", "time.series", "max.series", "multiple.tissue", "specific.tissue", "general.tissue", "class.tissue"]
+		reportHeader = ["gene", "cells.expressing", "cells.assayed", "cells.tracked", "cell.expression", "peak.expression", "fraction.expression", "series.count", "time.series", "max.series"]
+		tissueHeader = ["cell","multiple.tissue", "specific.tissue", "general.tissue", "class.tissue"]
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		
 		# create output files:
 		a_output = open(assayedfile, "w")
@@ -1350,7 +1530,10 @@ def main():
 					if ascendantCell in assayedMatrix[gene]:
 						ascendantExpression[ascendantCell] = float(assayedMatrix[gene][ascendantCell])
 						ascendantCells.append(ascendantCell)
+<<<<<<< HEAD
 				
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 				if ascendantExpression != dict():
 					
 					# get inheritance cells for maximal expression and for last ancestor expression:
@@ -1363,10 +1546,17 @@ def main():
 					inheritExpression[gene][inheritCell] = dict(assayedExpression[gene + ":" + ascendantCell])
 					inheritExpression[gene][inheritCell]["cell"] = str(inheritCell)
 					inheritExpression[gene][inheritCell]["cell.name"] = str(inheritCell)
+<<<<<<< HEAD
 					inheritExpression[gene][inheritCell]["specific.tissue"] = tissuesAnnotation[inheritCell]["specific.tissue"]
 					inheritExpression[gene][inheritCell]["general.tissue"] = tissuesAnnotation[inheritCell]["general.tissue"]
 					inheritExpression[gene][inheritCell]["class.tissue"] = tissuesAnnotation[inheritCell]["class.tissue"]
 					inheritExpression[gene][inheritCell]["match.tissue"] = tissuesAnnotation[inheritCell]["match.tissue"]
+=======
+					inheritExpression[gene][inheritCell]["multiple.tissue"] = tissuesAnnotation[inheritCell]["multiple.tissue"]
+					inheritExpression[gene][inheritCell]["specific.tissue"] = tissuesAnnotation[inheritCell]["specific.tissue"]
+					inheritExpression[gene][inheritCell]["general.tissue"] = tissuesAnnotation[inheritCell]["general.tissue"]
+					inheritExpression[gene][inheritCell]["class.tissue"] = tissuesAnnotation[inheritCell]["class.tissue"]
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 					inheritExpression[gene][inheritCell]["inherited"] = ascendantCell
 					#if inheritCell != inheritExpression[gene][inheritCell]["cell"]:
 					#	print cell, inheritExpression[gene][inheritCell]["cell"], 1
@@ -1376,10 +1566,17 @@ def main():
 					maximalExpression[gene][inheritCell] = dict(assayedExpression[gene + ":" + maximalCell])
 					maximalExpression[gene][inheritCell]["cell"] = str(inheritCell)
 					maximalExpression[gene][inheritCell]["cell.name"] = str(inheritCell)
+<<<<<<< HEAD
 					maximalExpression[gene][inheritCell]["specific.tissue"] = tissuesAnnotation[inheritCell]["specific.tissue"]
 					maximalExpression[gene][inheritCell]["general.tissue"] = tissuesAnnotation[inheritCell]["general.tissue"]
 					maximalExpression[gene][inheritCell]["class.tissue"] = tissuesAnnotation[inheritCell]["class.tissue"]
 					maximalExpression[gene][inheritCell]["match.tissue"] = tissuesAnnotation[inheritCell]["match.tissue"]
+=======
+					maximalExpression[gene][inheritCell]["multiple.tissue"] = tissuesAnnotation[inheritCell]["multiple.tissue"]
+					maximalExpression[gene][inheritCell]["specific.tissue"] = tissuesAnnotation[inheritCell]["specific.tissue"]
+					maximalExpression[gene][inheritCell]["general.tissue"] = tissuesAnnotation[inheritCell]["general.tissue"]
+					maximalExpression[gene][inheritCell]["class.tissue"] = tissuesAnnotation[inheritCell]["class.tissue"]
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 					maximalExpression[gene][inheritCell]["inherited"] = ascendantCell
 					
 		
@@ -3521,6 +3718,7 @@ def main():
 			neuron = initems.pop(0)
 			codeDict["neuron" + neuron] = initems
 		
+<<<<<<< HEAD
 		# load cellular expression data:
 		print
 		print "Loading cellular annotation..."
@@ -3531,11 +3729,29 @@ def main():
 		#specificCounts = general.build2(expressionpath + option.infile, i="specific.tissue" , mode="values", skip=True, counter=True)
 		#generalCounts = general.build2(expressionpath + option.infile, i="general.tissue", mode="values", skip=True, counter=True)
 		#classCounts = general.build2(expressionpath + option.infile, i="class.tissue", mode="values", skip=True, counter=True)
+=======
+		# load tissue-annotation data:
+		print
+		print "Loading cellular annotation..."
+		annotationDict = general.build2(expressionpath + option.expression, id_column="cell", value_columns=["specific.tissue", "general.tissue", "class.tissue"], skip=True, verbose=False)
+		cell = annotationDict.keys()[0]
+		
+		# load tissue annotation matrixes:
+		print
+		print "Loading tissue annotations..."
+		specificCounts = general.build2(expressionpath + option.infile, i="specific.tissue" , mode="values", skip=True, counter=True)
+		generalCounts = general.build2(expressionpath + option.infile, i="general.tissue", mode="values", skip=True, counter=True)
+		classCounts = general.build2(expressionpath + option.infile, i="class.tissue", mode="values", skip=True, counter=True)
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		totalCells = general.build2(expressionpath + option.expression, i="cell", x="specific.tissue", mode="values", skip=True)
 		totalCells = sorted(totalCells.keys())
 		
 		# gather tissue labels
+<<<<<<< HEAD
 		specificTissues, generalTissues, classTissues, matchTissues = list(), list(), list(), list()
+=======
+		specificTissues, generalTissues, classTissues = list(), list(), list()
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		for cell in annotationDict:
 			if not annotationDict[cell]["specific.tissue"] in specificTissues:
 				specificTissues.append(annotationDict[cell]["specific.tissue"])
@@ -3543,11 +3759,16 @@ def main():
 				generalTissues.append(annotationDict[cell]["general.tissue"])
 			if not annotationDict[cell]["class.tissue"] in classTissues:
 				classTissues.append(annotationDict[cell]["class.tissue"])
+<<<<<<< HEAD
 			if not annotationDict[cell]["match.tissue"] in matchTissues:
 				matchTissues.append(annotationDict[cell]["match.tissue"])
 			
 		# load cells identified in each neuron:
 		print
+=======
+			
+		# load cells identified in each neuron:
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		print "Loading cell identities per neuron..."
 		neuronDict = general.build2(summarypath + "mapneurons_summary.txt", id_column="neuron", value_columns=["class.ids"])
 		
@@ -3568,16 +3789,25 @@ def main():
 		
 		# generate tissue class scores:
 		cellList = list()
+<<<<<<< HEAD
 		cellMatrix, specificMatrix, generalMatrix, classMatrix, matchMatrix = dict(), dict(), dict(), dict(), dict()
+=======
+		cellMatrix, specificMatrix, generalMatrix, classMatrix = dict(), dict(), dict(), dict()
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		for neuron in neuronDict:
 			if not neuron in cellMatrix:
 				cellMatrix[neuron] = dict()
 				specificMatrix[neuron] = dict()
 				generalMatrix[neuron] = dict()
 				classMatrix[neuron] = dict()
+<<<<<<< HEAD
 				matchMatrix[neuron] = dict()
 			for cell in neuronDict[neuron]["class.ids"].split(","):
 				specificTissue, generalTissue, classTissue, matchTissue = annotationDict[cell]["specific.tissue"], annotationDict[cell]["general.tissue"], annotationDict[cell]["class.tissue"], annotationDict[cell]["match.tissue"]
+=======
+			for cell in neuronDict[neuron]["class.ids"].split(","):
+				specificTissue, generalTissue, classTissue = annotationDict[cell]["specific.tissue"], annotationDict[cell]["general.tissue"], annotationDict[cell]["class.tissue"]
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 				
 				if not cell in cellMatrix[neuron]:
 					cellMatrix[neuron][cell] = 0
@@ -3587,14 +3817,18 @@ def main():
 					generalMatrix[neuron][generalTissue] = 0
 				if not classTissue in classMatrix[neuron]:
 					classMatrix[neuron][classTissue] = 0
+<<<<<<< HEAD
 				if not matchTissue in matchMatrix[neuron]:
 					matchMatrix[neuron][matchTissue] = 0
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 				
 				cellList.append(cell)
 				cellMatrix[neuron][cell] += binaryMatrix[neuron][cell]
 				specificMatrix[neuron][specificTissue] += binaryMatrix[neuron][cell]
 				generalMatrix[neuron][generalTissue] += binaryMatrix[neuron][cell]
 				classMatrix[neuron][classTissue] += binaryMatrix[neuron][cell]
+<<<<<<< HEAD
 				matchMatrix[neuron][matchTissue] += binaryMatrix[neuron][cell]
 		cellList = sorted(list(set(cellList)))
 		
@@ -3603,6 +3837,12 @@ def main():
 		
 		# prepare class tallies for normalization:
 		specificTallies, generalTallies, classTallies, matchTallies = dict(), dict(), dict(), dict()
+=======
+		cellList = sorted(list(set(cellList)))
+		
+		# prepare class tallies for normalization:
+		specificTallies, generalTallies, classTallies = dict(), dict(), dict()
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		for cell in cellList:
 			if not annotationDict[cell]["specific.tissue"] in specificTallies:
 				specificTallies[annotationDict[cell]["specific.tissue"]] = 0
@@ -3610,6 +3850,7 @@ def main():
 				generalTallies[annotationDict[cell]["general.tissue"]] = 0
 			if not annotationDict[cell]["class.tissue"] in classTallies:
 				classTallies[annotationDict[cell]["class.tissue"]] = 0
+<<<<<<< HEAD
 			if not annotationDict[cell]["match.tissue"] in matchTallies:
 				matchTallies[annotationDict[cell]["match.tissue"]] = 0
 			specificTallies[annotationDict[cell]["specific.tissue"]] += 1
@@ -3619,6 +3860,11 @@ def main():
 		
 		# Note: The above tallies record the number of cells (observed, 
 		# in neurons) that correspond to each tissue.***
+=======
+			specificTallies[annotationDict[cell]["specific.tissue"]] += 1
+			generalTallies[annotationDict[cell]["general.tissue"]] += 1
+			classTallies[annotationDict[cell]["class.tissue"]] += 1
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		
 		# prepare output files:
 		f_output = open(compositionpath + "mapcells_composition_codes.txt", "w")
@@ -3626,14 +3872,20 @@ def main():
 		s_output = open(compositionpath + "mapcells_composition_specific.txt", "w")
 		g_output = open(compositionpath + "mapcells_composition_general.txt", "w")
 		l_output = open(compositionpath + "mapcells_composition_class.txt", "w")
+<<<<<<< HEAD
 		m_output = open(compositionpath + "mapcells_composition_match.txt", "w")
 		
 		# print out headers:
 		print >>f_output, "\t".join(["neuron", "id", "fraction.ids"])
+=======
+		
+		# print out headers:
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		print >>c_output, "\t".join(["neuron", "id", "id.found", "id.cells", "fraction.ids", "fraction.sum", "fraction.max", "fraction.nrm", "pvalue", "pvalue.adj", "score"])
 		print >>s_output, "\t".join(["neuron", "id", "id.found", "id.cells", "fraction.ids", "fraction.sum", "fraction.max", "fraction.nrm", "pvalue", "pvalue.adj", "score"])
 		print >>g_output, "\t".join(["neuron", "id", "id.found", "id.cells", "fraction.ids", "fraction.sum", "fraction.max", "fraction.nrm", "pvalue", "pvalue.adj", "score"])
 		print >>l_output, "\t".join(["neuron", "id", "id.found", "id.cells", "fraction.ids", "fraction.sum", "fraction.max", "fraction.nrm", "pvalue", "pvalue.adj", "score"])
+<<<<<<< HEAD
 		print >>m_output, "\t".join(["neuron", "id", "id.found", "id.cells", "fraction.ids", "fraction.sum", "fraction.max", "fraction.nrm", "pvalue", "pvalue.adj", "score"])
 		
 		# Note: We will now output the following information:
@@ -3642,16 +3894,30 @@ def main():
 		# fraction.ids: fraction of ID diversity in neuron.
 		# fraction.sum: fraction of cellular diversity in neuron that matches ID.
 		# fraction.rat: fraction of cellular diversity in neuron that matches ID, normalized by the representation of the ID.
+=======
+		
+		# id.found : is ID found in neuron?
+		# id.cells : number of cells (diversity) that match ID.
+		# fraction.ids: fraction, match ID/IDs found in neuron.
+		# fraction.sum: fraction of cellular diversity in neuron that matches ID. 
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		# fraction.max: fraction of cellular diversity in neuron as normalized by the ID with the highest cellular diversity in neuron. 
 		# fraction.nrm: fraction of cellular diversity in neuron as normalized by the total number of cells with said ID.
 		
 		# determine missed tissues:
 		print
+<<<<<<< HEAD
 		specificMissed, generalMissed, classMissed, matchMissed = set(specificTissues).difference(set(specificTallies.keys())), set(generalTissues).difference(set(generalTallies.keys())), set(classTissues).difference(set(classTallies.keys())), set(matchTissues).difference(set(matchTallies.keys()))
 		print "Specific tissues not found:", str(len(specificMissed)) + " (" + str(len(specificTissues)) + ") ; " + ",".join(sorted(specificMissed))
 		print "General tissues not found:", str(len(generalMissed)) + " (" + str(len(generalTissues)) + ") ; " + ",".join(sorted(generalMissed))
 		print "Class tissues not found:", str(len(classMissed)) + " (" + str(len(classTissues)) + ") ; " + ",".join(sorted(classMissed))
 		print "Match tissues not found:", str(len(matchMissed)) + " (" + str(len(matchTissues)) + ") ; " + ",".join(sorted(matchMissed))
+=======
+		specificMissed, generalMissed, classMissed = set(specificTissues).difference(set(specificTallies.keys())), set(generalTissues).difference(set(generalTallies.keys())), set(classTissues).difference(set(classTallies.keys()))
+		print "Specific tissues not found:", str(len(specificMissed)) + " (" + str(len(specificTissues)) + ") ; " + ",".join(sorted(specificMissed))
+		print "General tissues not found:", str(len(generalMissed)) + " (" + str(len(generalTissues)) + ") ; " + ",".join(sorted(generalMissed))
+		print "Class tissues not found:", str(len(classMissed)) + " (" + str(len(classTissues)) + ") ; " + ",".join(sorted(classMissed))
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		print
 		
 		# export the fractions:
@@ -3737,6 +4003,7 @@ def main():
 					score = hyper.directional(count, universe, total, tally, adjust=adjust)
 					print >>l_output, "\t".join(map(str, [neuron, classTissue, index, count, float(index)/types, float(count)/total, float(count)/maxxx, float(count)/tally, pvalue, adjPvalue, score]))
 		
+<<<<<<< HEAD
 				# export match tissue enrichment:
 				for matchTissue in sorted(matchTallies.keys()):
 					types = len(matchMatrix[neuron].keys())
@@ -3756,12 +4023,15 @@ def main():
 					score = hyper.directional(count, universe, total, tally, adjust=adjust)
 					print >>m_output, "\t".join(map(str, [neuron, matchTissue, index, count, float(index)/types, float(count)/total, float(count)/maxxx, float(count)/tally, pvalue, adjPvalue, score]))
 		
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		# close outputs:
 		f_output.close()
 		c_output.close()
 		s_output.close()
 		g_output.close()
 		l_output.close()
+<<<<<<< HEAD
 		m_output.close()
 		
 		print
@@ -3804,6 +4074,8 @@ def main():
 			# close outputs:
 			f_output.close()
 		
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		print
 		
 	
@@ -3988,6 +4260,7 @@ if __name__ == "__main__":
 	
 	print "Completed:", time.asctime(time.localtime())
 
+<<<<<<< HEAD
 #python mapCells.py --path ~/meTRN --mode import --infile murray_2012_supplemental_dataset_1_per_gene.txt --name murray # Retired!
 
 #python mapCells.py --path ~/meTRN --mode import --infile waterston_avgExpression.csv --name waterston --measure max.expression
@@ -4004,3 +4277,18 @@ if __name__ == "__main__":
 
 
 #python mapCells.py --path ~/meTRN --organism ce --mode robust --infile waterston_avgExpression.csv
+=======
+#python mapCells.py --path ~/ceTRN --mode import --infile murray_2012_supplemental_dataset_1_per_gene.txt --name murray # Retired!
+
+#python mapCells.py --path ~/ceTRN --mode import --infile waterston_avgExpression.csv --name waterston --measure max.expression
+#python mapCells.py --path ~/ceTRN --mode import --infile waterston_avgExpression.csv --name waterston --measure avg.expression
+
+#python mapCells.py --path ~/ceTRN --mode check.status --peaks optimal_standard_factor_sx_rawraw --name waterston --measure avg.expression
+#python mapCells.py --path ~/ceTRN --mode check.status --peaks optimal_standard_factor_ex_rawraw --name waterston --measure avg.expression
+
+#python mapCells.py --path ~/ceTRN/ --mode build.lineages --pedigree waterston_cell_pedigree.csv --expression mapcells_avgExp_waterston_expression_tracked --name waterston.tracked --method builder --lineages tracked --descendants OFF --ascendants OFF --limit 10000
+#python mapCells.py --path ~/ceTRN/ --mode build.lineages --pedigree waterston_cell_pedigree.csv --expression mapcells_avgExp_waterston_expression_tracked --name waterston.tracked --method builder --lineages complete --descendants OFF --ascendants OFF --limit 10000
+
+#python mapCells.py --path ~/ceTRN/ --mode test.lineages --pedigree waterston_cell_pedigree.csv --expression mapcells_avgExp_waterston_expression_tracked --name waterston.tracked --method builder --lineages tracked --descendants OFF --ascendants OFF --limit 10000
+#python mapCells.py --path ~/ceTRN/ --mode test.lineages --pedigree waterston_cell_pedigree.csv --expression mapcells_avgExp_waterston_expression_assayed --name waterston.assayed --method builder --lineages tracked --descendants OFF --ascendants OFF --limit 10000
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428

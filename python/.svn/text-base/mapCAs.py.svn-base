@@ -41,8 +41,11 @@ def main():
 	parser.add_option("--cutoff", action = "store", type = "float", dest = "cutoff", help = "p-value cutoff for fraction calculation", default=0.05)
 	parser.add_option("--threads", action = "store", type = "string", dest = "threads", help = "multiprocessing threads", default="1")
 	parser.add_option("--chunks", action = "store", type = "int", dest = "chunks", help = "", default=100)
+<<<<<<< HEAD
 	parser.add_option("--include", action = "store", type = "string", dest = "include", help = "Targets to include", default="OFF")
 	parser.add_option("--exclude", action = "store", type = "string", dest = "exclude", help = "Targets to exclude", default="OFF")
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 	parser.add_option("--qsub", action = "store", type = "string", dest = "qsub", help = "qsub configuration header", default="OFF")
 	parser.add_option("--server", action = "store", type = "string", dest = "server", help = "are we on the server?", default="OFF")
 	parser.add_option("--job", action = "store", type = "string", dest = "job", help = "job name for cluster", default="OFF")
@@ -144,6 +147,7 @@ def main():
 			for PK2 in peak_files:
 				if PK1 != PK2:
 				
+<<<<<<< HEAD
 					# check inclusion flags:
 					process = False
 					if option.include == "OFF":
@@ -176,6 +180,24 @@ def main():
 						if len(commands) == option.chunks:
 							modules.append(commands)
 							commands = list()
+=======
+					# define output files:
+					outfile = "mapcas_" + option.name + "_" + PK1.replace(".bed","") + "_vs_" + PK2
+					outpath = coassociationspath + option.peaks + "/" + option.name + "/results/"
+					
+					# generate IntervalStats command:
+					command = "IntervalStats -q <<FILE1>> -r <<FILE2>> -d <<DOMAINS>> -o <<OUTPUT>>"
+					command = command.replace("<<FILE1>>", peakspath + option.peaks + "/" + PK1)
+					command = command.replace("<<FILE2>>", peakspath + option.peaks + "/" + PK2)
+					command = command.replace("<<DOMAINS>>", domainpath + option.domain)
+					command = command.replace("<<OUTPUT>>", outpath + outfile)
+					commands.append(command)
+					sequences.append(command)
+					
+					if len(commands) == option.chunks:
+						modules.append(commands)
+						commands = list()
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		
 		if commands != list():
 			modules.append(commands)
@@ -360,7 +382,10 @@ def main():
 			print >>f_output, inline.strip() + "\t" + paralogFlag
 		f_output.close()
 		
+<<<<<<< HEAD
 		
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 	
 if __name__ == "__main__":
 	main()

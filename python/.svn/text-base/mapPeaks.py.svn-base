@@ -150,7 +150,10 @@ def main():
 				dataHeaders = ["dataset","peaks","avg.size", "organism", "strain", "factor", "context", "institute", "method"]
 				
 				# specify output files:
+<<<<<<< HEAD
 				unsortedfile = peakspath + "mappeaks_" + peakSet + "_unsorted.bed"
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 				completefile = peakspath + "mappeaks_" + peakSet + "_complete.bed"
 				collapsefile = peakspath + "mappeaks_" + peakSet + "_collapse.bed"
 				compiledfile = peakspath + "mappeaks_" + peakSet + "_compiled.bed"
@@ -167,8 +170,14 @@ def main():
 					print "Processing:", peakSet
 					
 					# define output files:
+<<<<<<< HEAD
 					u_output = open(unsortedfile, "w")
 					r_output = open(reportfile, "w")
+=======
+					c_output = open(completefile, "w")
+					r_output = open(reportfile, "w")
+					#print >>m_output, "\t".join(peakHeaders)
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 					print >>r_output, "\t".join(dataHeaders)
 					
 					# export and prebuild peaks dictionary:
@@ -179,6 +188,10 @@ def main():
 							
 							dataset = peakfile.replace("_peaks.bed","")
 							organism, strain, factor, context, institute, method = metrn.labelComponents(dataset)
+<<<<<<< HEAD
+=======
+								
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 							peaks, sizes = 0, list()
 							for inline in open(peakspath + peakSet + "/" + peakfile).readlines():
 								chrm, start, end, feature, score, strand, signal, pvalue, qvalue, point = inline.strip().split("\t")[:10]
@@ -186,7 +199,11 @@ def main():
 								size = end-start
 								strand = "+"
 								output = [chrm, start, end, feature, str(score), strand, signal, pvalue, qvalue, point, size, dataset, organism, strain, factor, context, institute, method]
+<<<<<<< HEAD
 								print >>u_output, "\t".join(map(str, output))
+=======
+								print >>c_output, "\t".join(map(str, output))
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 								sizes.append(size)
 								peaks += 1
 							
@@ -194,6 +211,7 @@ def main():
 							print >>r_output, "\t".join(map(str, output))
 					
 					# close output file:
+<<<<<<< HEAD
 					u_output.close()
 					r_output.close()
 					
@@ -201,6 +219,11 @@ def main():
 					command = "sortBed -i " + unsortedfile + " > " + completefile 
 					os.system(command)
 					
+=======
+					c_output.close()
+					r_output.close()
+					
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 					# generate collapsed file:
 					print "Generating collapsed peaks file..."
 					command = "mergeBed -i " + completefile + " -nms > " + collapsefile
@@ -211,8 +234,11 @@ def main():
 					metrn.densityBed(collapsefile, compiledfile)
 					
 					# delete collapse file (since it is redundant):
+<<<<<<< HEAD
 					command = "rm -rf " + unsortedfile
 					os.system(command)
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 					command = "rm -rf " + collapsefile
 					os.system(command)
 					

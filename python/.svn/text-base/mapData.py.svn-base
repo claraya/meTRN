@@ -28,12 +28,19 @@ def main():
 	parser.add_option("--source", action = "store", type = "string", dest = "source", help = "Input path", default="OFF")
 	parser.add_option("--peaks", action = "store", type = "string", dest = "peaks", help = "peaks to be used for analysis", default="OFF")
 	parser.add_option("--organism", action = "store", type = "string", dest = "organism", help = "Target organism for operations...", default="OFF")
+<<<<<<< HEAD
 	parser.add_option("--library", action = "store", type = "string", dest = "library", help = "library configuration final report card", default="OFF")
 	parser.add_option("--rmdup", action = "store", type = "string", dest = "rmdup", help = "Remove duplicates library", default="OFF")
 	parser.add_option("--overwrite", action = "store", type = "string", dest = "overwrite", help = "Overwrite files?", default="OFF")
 	parser.add_option("--rename", action = "store", type = "string", dest = "rename", help = "Targets to rename. Comma-separated list of 'target:replacement' pairs to search and replace.", default="OFF")
 	parser.add_option("--include", action = "store", type = "string", dest = "include", help = "Targets to include", default="OFF")
 	parser.add_option("--exclude", action = "store", type = "string", dest = "exclude", help = "Targets to exclude", default="OFF")
+=======
+	parser.add_option("--library", action = "store", type = "string", dest = "library", help = "library configuration final report card")
+	parser.add_option("--rmdup", action = "store", type = "string", dest = "rmdup", help = "Remove duplicates library", default="OFF")
+	parser.add_option("--overwrite", action = "store", type = "string", dest = "overwrite", help = "Overwrite files?", default="OFF")
+	parser.add_option("--rename", action = "store", type = "string", dest = "rename", help = "Targets to rename. Comma-separated list of 'target:replacement' pairs to search and replace.", default="OFF")
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 	parser.add_option("--contexts", action = "store", type = "string", dest = "contexts", help = "Contexts to compare", default="OFF")
 	parser.add_option("--species", action = "store", type = "string", dest = "species", help = "Species to compare", default="OFF")
 	parser.add_option("--orthology", action = "store", type = "string", dest = "orthology", help = "Use 'direct' or 'family' orthologs?", default="direct")
@@ -381,12 +388,17 @@ def main():
 			print
 		
 	
+<<<<<<< HEAD
 	# file survey mode, counts numbers of files and reads:
+=======
+	# file survey mode:
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 	elif option.mode == "survey":
 	
 		print
 		print "Loading configuration dictionary..."
 		configDict = general.build2(path_dict[option.source] + option.infile, id_column="url")
+<<<<<<< HEAD
 		process = False
 		
 		if "mapdata_revise_" + option.peaks + "_library_report.txt" in os.listdir(reportspath + option.organism):
@@ -398,6 +410,8 @@ def main():
 			print "Loading revised configurations..."
 			datasetDict = general.build2(datasetReport, id_column="dataset")
 			libraryDict = general.build2(libraryReport, id_column="filename")
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		
 		print "Loading peak set files of interest..."
 		peakfiles = os.listdir(peakspath + option.peaks)
@@ -422,6 +436,7 @@ def main():
 		print "Peaks files (ChIP-seq experiments):", len(peakfiles)
 		print "Match files (ChIP-seq FASTQs):", len(inputKeys)
 		
+<<<<<<< HEAD
 		# collect input reads: 
 		sumReads = 0
 		for inputKey in inputKeys:
@@ -899,6 +914,36 @@ def main():
 		l_output.close()
 	
 		
+=======
+		sumReads = 0
+		for inputKey in inputKeys:
+			sumReads += int(configDict[inputKey]["input.reads"])
+		print "Match reads (Millions)", round(float(sumReads)/(1000000), 2)
+		print
+	
+	# reinke file copy mode:
+	elif option.mode == "reinke":
+	
+		# fastq files:
+		fastqpath = fastqpath.replace("meTRN", "ceTRN")
+		fastqfiles = os.listdir(fastqpath)
+		print len(fastqfiles)
+	
+		print
+		print "Copying FASTQ files..."
+		for infile in open(path_dict[option.source] + option.infile).readlines():
+			if infile.strip() in fastqfiles:
+				print infile.strip()
+				command = "cp " + fastqpath + infile.strip() + " /Library/WebServer/Documents/cetrn/reinke/"
+				os.system(command)
+			else:
+				print "File not found:", infile
+				pdb.set_trace()
+		
+		print
+	
+	
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 	# waterston new genes mode:
 	elif option.mode == "waterston":
 	
@@ -939,7 +984,11 @@ if __name__ == "__main__":
 	
 	print "Completed:", time.asctime(time.localtime())
 
+<<<<<<< HEAD
 
+=======
+#python mapData.py --path ~/meTRN/ --mode survey --organism ce --source extras --infile cetrn/configure_final_summary.txt --peaks ce_reporting_com_xx_raw --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 #python mapData.py --path ~/meTRN/ --mode paralogs --organism ce --source extras --infile modencode.family.common.report.txt
 #python mapData.py --path ~/meTRN/ --mode sunburst --organism ce --source extras --infile ce_modencode_report.tab --peaks ce_reporting_com_xx_raw
 #python mapData.py --path ~/meTRN/ --mode sunburst --organism dm --source extras --infile dm_modencode_report.tab 
@@ -951,7 +1000,11 @@ if __name__ == "__main__":
 #python mapData.py --path ~/meTRN/ --mode scanner --peaks ce_selection_com_l2_raw
 #python mapData.py --path ~/meTRN/ --mode scanner --peaks ce_selection_com_l3_raw
 #python mapData.py --path ~/meTRN/ --mode scanner --peaks ce_selection_com_l4_raw
+<<<<<<< HEAD
 #python mapData.py --path ~/meTRN/ --mode scanner --peaks ce_selection_com_cx_raw
 
 
 
+=======
+#python mapData.py --path ~/meTRN/ --mode scanner --peaks ce_selection_com_cx_raw
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428

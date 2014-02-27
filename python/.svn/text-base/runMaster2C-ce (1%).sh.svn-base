@@ -225,6 +225,7 @@
 #cp ~/meTRN/data/peaks/ce_extension_com_l4_xot/* ~/meTRN/data/peaks/ce_extension_com_cx_xot/
 
 
+<<<<<<< HEAD
 
 # Generate HOT-filtered corrected peak sets (occupancy P01 cutoff):
 #python mapHOT.py --path ~/meTRN --organism ce --mode filter:remove --peaks ce_corrected_com_cx_xon --infile maphot_ce_selection_reg_cx_occP01_any.bed --source ~/meTRN/data/peaks/ce_corrected_com_cx_raw
@@ -252,6 +253,8 @@
 
 
 
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 # Generate complete, collapsed, density and report files:
 #python mapPeaks.py --path ~/meTRN --mode build --overwrite OFF
 

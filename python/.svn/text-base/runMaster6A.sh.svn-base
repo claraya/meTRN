@@ -3,6 +3,7 @@
 
 # Filter cell annotations:
 #python mapCells.py --path ~/meTRN --organism ce --mode filter --source extras --infile waterston_cell_original/pedigree.csv --target waterston_cell_original/filter.csv --name waterston_cell_pedigree.csv
+<<<<<<< HEAD
 #python mapCells.py --path ~/meTRN --organism ce --mode filter --source extras --infile waterston_cell_original/tissues.csv --target waterston_cell_original/filter.csv --name waterston_cell_tissues-v1.csv
 
 
@@ -21,11 +22,26 @@
 
 
 # Inherit cellular expression down through ancestry (using leaf cells from Murray et al. 2012; re-done for new annotations!):
+=======
+#python mapCells.py --path ~/meTRN --organism ce --mode filter --source extras --infile waterston_cell_original/tissues.csv --target waterston_cell_original/filter.csv --name waterston_cell_tissues.csv
+
+
+# Import cellular expression data:
+#python mapCells.py --path ~/meTRN --organism ce --mode import --infile waterston_avgExpression.csv --pedigree waterston_cell_pedigree.csv --name waterston --measure avg.expression --ascendants 5 --tissues waterston_cell_tissues.csv --mapping waterston_cell_mapping.csv --target AMA-1,LSY-2,LIN-13,MEP-1,CES-1,CEH-26,NHR-2,CEH-39,MAB-5,HLH-1,UNC-39,F23F12.9,NHR-28 --exclude LIR-2
+#python mapCells.py --path ~/meTRN --organism ce --mode import --infile waterston_avgExpression.csv --pedigree waterston_cell_pedigree.csv --name waterston --measure max.expression --ascendants 5 --tissues waterston_cell_tissues.csv --mapping waterston_cell_mapping.csv --target AMA-1,LSY-2,LIN-13,MEP-1,CES-1,CEH-26,NHR-2,CEH-39,MAB-5,HLH-1,UNC-39,F23F12.9,NHR-28 --exclude LIR-2
+
+
+# Inherit cellular expression down through ancestry (getting leaf cells from Murray et al. 2012):
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 #python mapCells.py --path ~/meTRN --organism ce --mode inherit --infile waterston_avgExpression.csv --pedigree waterston_cell_pedigree.csv --name waterston --measure avg.expression --mapping murray_2012_SD1_per_gene.txt --inherit last
 #python mapCells.py --path ~/meTRN --organism ce --mode inherit --infile waterston_avgExpression.csv --pedigree waterston_cell_pedigree.csv --name waterston --measure max.expression --mapping murray_2012_SD1_per_gene.txt --inherit last
 
 
+<<<<<<< HEAD
 # Rank and correct cellular expression estimates (Re-done for new annotations!):
+=======
+# Rank and correct cellular expression estimates:
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 #python mapCells.py --path ~/meTRN --organism ce --mode correct --infile waterston_avgExpression.csv --pedigree waterston_cell_pedigree.csv --name waterston --measure avg.expression --limit 1500 --parameters 3
 
 
@@ -149,7 +165,11 @@
 #python mapCells.py --path ~/meTRN --organism ce --mode cell.matrix --expression mapcells_avgExp_waterston_expression_inleafs --collection cetrn_inleafs_f0.1 --name normal --fraction 0.1 --technique normal
 
 
+<<<<<<< HEAD
 # Map lineage and tissue enrichments for factors (Re-done for new annotations!):
+=======
+# Map lineage and tissue enrichments for factors:
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 #python mapCells.py --path ~/meTRN --organism ce --mode test.tissues --infile mapcells_avgExp_waterston_expression_tissues --expression mapcells_avgExp_waterston_expression_inleafs --collection cetrn_inleafs_f0.1
 
 

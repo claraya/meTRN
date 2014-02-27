@@ -100,17 +100,28 @@ def main():
 			genome_size_dict = general.build_config(genome_size_file, mode="single", separator="\t", spaceReplace=True)
 	
 	# determine where the files are stored:
+<<<<<<< HEAD
 	if option.mode != "intervals":
 		path = path_dict[option.folder]
 		infile = path + option.infile
 	
 	# obtain the input file for conversion and mode information:
+=======
+	path = path_dict[option.folder]
+	
+	# obtain the input file for conversion and mode information:
+	infile = path + option.infile
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 	outfile = annotationspath + "in2shape_" + option.name
 	if "windows" == option.mode:
 		outfile = annotationspath + "in2shape_" + option.infile.replace(".nh.bed","").replace(".nh.gff","").replace(".bed","").replace(".gff","").replace("in2shape_", "") + "_windows_" + option.name
 	
 	# read input lines into memory:
+<<<<<<< HEAD
 	if not "spell:" in option.mode and not "adjust" == option.mode and not "wbGene:protein" == option.mode and not "slopbed" == option.mode and not "waterston:tss" == option.mode and not "intervals" == option.mode:
+=======
+	if not "spell:" in option.mode and not "adjust" == option.mode and not "wbGene:protein" == option.mode and not "slopbed" == option.mode and not "waterston:tss" == option.mode:
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 		indata = open(infile, "U")
 	
 	# set the output files and adjustment dictionary if necessary:
@@ -156,6 +167,7 @@ def main():
 		g_outfile = outfile + adjust_handle + ".gff"
 		bh_outfile = outfile + adjust_handle + ".nh.bed"
 		gh_outfile = outfile + adjust_handle + ".nh.gff"
+<<<<<<< HEAD
 	
 	# generate genomic intervals:	
 	if "intervals" == option.mode:
@@ -168,6 +180,12 @@ def main():
 	
 	# convert input ensGene annotation data into bed format:
 	elif "ensGene" in option.mode and not "fly-ensGene" in option.mode:
+=======
+		
+	
+	# convert input ensGene annotation data into bed format:
+	if "ensGene" in option.mode and not "fly-ensGene" in option.mode:
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 	
 		# set mode and target features:
 		mode, target = option.mode.split(":")

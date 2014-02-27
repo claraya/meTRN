@@ -35,5 +35,8 @@
 #cp -r ~/meTRN/data/coassociations/ce_selection_com_cx_xot ~/meTRN/data/coassociations/ce_extension_com_cx_xot
 #python mapCAs.py --path ~/meTRN --mode launch --peaks ce_extension_com_cx_xot --source annotations --domain in2shape_ce_wormbased_TSS_gx_slopbed_up2000_dn200.nh.bed --name promoter_regions --overwrite OFF
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 #top

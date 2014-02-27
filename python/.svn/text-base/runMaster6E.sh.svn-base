@@ -36,7 +36,11 @@
 #python mapCells.py --path ~/meTRN --organism ce --mode cell.collection --peaks ce_selection_com_ex_raw --technique binary --neurons cell.ex.som --collection cetrn_cellular_raw
 
 
+<<<<<<< HEAD
 # Check composition of neurons (Re-done for new annotations!):
+=======
+# Check composition of neurons:
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 #python mapCells.py --path ~/meTRN --organism ce --mode test.composition --infile mapcells_avgExp_waterston_expression_tissues --expression mapcells_avgExp_waterston_expression_focused --peaks ce_selection_com_ex_raw --neurons cell.ex.som --name cetrn_cellular_raw
 
 

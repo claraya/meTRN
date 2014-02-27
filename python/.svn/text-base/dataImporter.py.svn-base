@@ -40,7 +40,10 @@ def main():
 	parser.add_option("--target", action = "store", type = "string", dest = "target", help = "Targets...", default="OFF")
 	parser.add_option("--include", action = "store", type = "string", dest = "include", help = "Targets to include", default="OFF")
 	parser.add_option("--exclude", action = "store", type = "string", dest = "exclude", help = "Targets to exclude", default="OFF")
+<<<<<<< HEAD
 	parser.add_option("--allow", action = "store", type = "string", dest = "allow", help = "Targets to allow, despite exclusion", default="OFF")
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 	parser.add_option("--rename", action = "store", type = "string", dest = "rename", help = "Targets to rename. Comma-separated list of 'target:replacement' pairs to search and replace.", default="OFF")
 	parser.add_option("--nonredundant", action = "store", type = "string", dest = "nonredundant", help = "Filter redundants?", default="OFF")
 	parser.add_option("--parameters", action = "store", type = "string", dest = "parameters", help = "Variable parameters...", default="OFF")
@@ -207,21 +210,36 @@ def main():
 		print "Selecting compliant datasets..."
 		selections = list()
 		for infile in infiles:
+<<<<<<< HEAD
 			inclusions, exclusions, allowances = list(), list(), list()
+=======
+			inclusions, exclusions = list(), list()
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 			if option.include != "OFF":
 				for target in option.include.split(","):
 					if target in infile:
 						inclusions.append(target)
+<<<<<<< HEAD
+=======
+				#for target in option.include.split(";"):
+				#	if target in infile:
+				#		inclusions.append(target)
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 			if option.exclude != "OFF":
 				for exclusion in option.exclude.split(","):
 					if exclusion in infile:
 						exclusions.append(exclusion)
+<<<<<<< HEAD
 			if option.allow != "OFF":
 				for allowance in option.allow.split(","):
 					if allowance in infile:
 						allowances.append(allowance)
 			if inclusions != list() or len(inclusions) == len(option.include.split(";")) or option.include == "OFF":
 				if exclusions == list() or option.exclude == "OFF" or allowances != list():
+=======
+			if inclusions != list() or len(inclusions) == len(option.include.split(";")) or option.include == "OFF":
+				if exclusions == list() or option.exclude == "OFF":
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 					selections.append(infile)
 					i += 1
 			
@@ -241,7 +259,11 @@ def main():
 				sources = general.valuesort(dataset_dict[label])
 				sources.reverse()
 				if len(sources) > 1:
+<<<<<<< HEAD
 					print label, len(sources), sources
+=======
+					print label, len(sources)
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 					n += 1
 				selections.append(sources[0])
 			print

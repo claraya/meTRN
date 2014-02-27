@@ -5,13 +5,19 @@
 
 
 # Import ortholog families:
+<<<<<<< HEAD
 #rsync -avz claraya@crick.stanford.edu:/srv/gs1/projects/snyder/modENCODE/data/orthologs/family_group/* ~/meTRN/data/orthologs/families/
 #rsync -avz claraya@crick.stanford.edu:/srv/gs1/projects/snyder/modENCODE/data/orthologs/family_group/formatted* ~/meTRN/data/orthologs/families/
+=======
+#rsync -avz claraya@snively.stanford.edu:/srv/gs1/projects/snyder/modENCODE/data/orthologs/family_group/* ~/meTRN/data/orthologs/families/
+#rsync -avz claraya@snively.stanford.edu:/srv/gs1/projects/snyder/modENCODE/data/orthologs/family_group/formatted* ~/meTRN/data/orthologs/families/
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 #reNamr ~/meTRN/data/orthologs/families/ cel ce
 #reNamr ~/meTRN/data/orthologs/families/ dmel dm
 
 
 # Transfer inputs, code, and qsub configurations:
+<<<<<<< HEAD
 #rsync -avz ~/meTRN/input/ claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/input/
 #rsync -avz ~/meTRN/python/ claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/python/
 #rsync -avz ~/meTRN/scripts/ claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/scripts/
@@ -28,10 +34,29 @@
 
 # Transfer peaks to modENCODE shared folder:
 #rsync -avz ~/meTRN/data/peaks/ claraya@crick.stanford.edu:/srv/gs1/projects/snyder/modENCODE/data/peaks/sets/
+=======
+#rsync -avz ~/meTRN/input/ claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/input/
+#rsync -avz ~/meTRN/python/ claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/python/
+#rsync -avz ~/meTRN/scripts/ claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/scripts/
+#rsync -avz ~/meTRN/qsub/ claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/qsub/
+#rsync -avz ~/Tools/python/ claraya@snively.stanford.edu:~/Tools/python/
+
+
+# Transfer peaks and HOT-region data:
+#rsync -avz ~/meTRN/data/peaks/ claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/peaks/
+#rsync -avz ~/meTRN/data/annotations/ claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/annotations/
+#rsync -avz ~/meTRN/data/hot/density/mergeBed* claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/hot/density/
+#rsync -avz ~/meTRN/data/hot/regions/ claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/hot/regions/
+
+
+# Transfer peaks to modENCODE shared folder:
+#rsync -avz ~/meTRN/data/peaks/ claraya@snively.stanford.edu:/srv/gs1/projects/snyder/modENCODE/data/peaks/sets/
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 
 
 # Transfer co-association results:
 #rsync -avz araya@nexus.gs.washington.edu:~/meTRN/data/coassociations/*ortho* ~/meTRN/data/coassociations/
+<<<<<<< HEAD
 #rsync -avz claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/ce_selection* ~/meTRN/data/coassociations/
 #rsync -avz claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/hs_selection* ~/meTRN/data/coassociations/
 #rsync -avz claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/dm_selection* ~/meTRN/data/coassociations/
@@ -41,6 +66,16 @@
 # Transfer cellular resolution data (to Stanford SCG3):
 #rsync -avz ~/meTRN/data/cells/peaks/ claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/cells/peaks/
 #rsync -avz ~/meTRN/data/cells/annotations/ claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/cells/annotations/
+=======
+#rsync -avz claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/ce_selection* ~/meTRN/data/coassociations/
+#rsync -avz claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/hs_selection* ~/meTRN/data/coassociations/
+#rsync -avz claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/dm_selection* ~/meTRN/data/coassociations/
+
+
+# Transfer cellular resolution data (to Stanford SCG3):
+#rsync -avz ~/meTRN/data/cells/peaks/ claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/cells/peaks/
+#rsync -avz ~/meTRN/data/cells/annotations/ claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/cells/annotations/
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 
 
 # Transfer cellular resolution data (to UW Nexus):
@@ -49,6 +84,7 @@
 
 
 # Transfer worm-specific co-association analyses:
+<<<<<<< HEAD
 #rsync -avz claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/ce_xptracked_reg_ex_all* ~/meTRN/data/coassociations/
 #rsync -avz claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/ce_xptracked_reg_ex_240* ~/meTRN/data/coassociations/
 #rsync -avz claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/ce_brunetlab* ~/meTRN/data/coassociations/
@@ -65,6 +101,24 @@
 # Pending:
 #rsync -avz claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/*selection* ~/meTRN/data/coassociations/
 #rsync -avz claraya@crick.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/*selection* ~/meTRN/data/coassociations/
+=======
+#rsync -avz claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/ce_xptracked_reg_ex_all* ~/meTRN/data/coassociations/
+#rsync -avz claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/ce_xptracked_reg_ex_240* ~/meTRN/data/coassociations/
+#rsync -avz claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/ce_brunetlab* ~/meTRN/data/coassociations/
+
+
+# Transfer worm-specific SOM data (Stanford):
+#rsync -avz ~/meTRN/data/neurons/ claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/neurons/
+
+
+# Recover worm-specific SOM seeds (Stanford):
+#rsync -avz claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/neurons/ ~/meTRN/data/neurons/ 
+
+
+# Pending:
+#rsync -avz claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/*selection* ~/meTRN/data/coassociations/
+#rsync -avz claraya@snively.stanford.edu:/srv/gs1/projects/snyder/claraya/meTRN/data/coassociations/*selection* ~/meTRN/data/coassociations/
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 
 
 # Transfer setup to GS clusters:

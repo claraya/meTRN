@@ -16,13 +16,17 @@ import pdb
 import re
 import network
 
+<<<<<<< HEAD
 from Bio import Motif
 
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 print "Command:", " ".join(sys.argv)
 print "Timestamp:", time.asctime(time.localtime())
 
 """ define classes and functions of internal use """
 
+<<<<<<< HEAD
 
 """ define a function to build a fasta file from a bed file... """
 def fastaGenerator(inputfile, coordfile, fastafile, genomefile, window=0, top="OFF"):
@@ -159,10 +163,13 @@ def motifScanner(scanDict, orthologDict, cutoff=0.25, size=3, exclusions="OFF"):
 
 
 
+=======
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 def main():
 	
 	parser = optparse.OptionParser()
 	parser.add_option("--path", action = "store", type = "string", dest = "path", help = "Path from script to files")
+<<<<<<< HEAD
 	parser.add_option("--mode", action = "store", type = "string", dest = "mode", help = "Analysis mode: Determines operations to execute.")
 	parser.add_option("--infile", action = "store", type = "string", dest = "infile", help = "Input file for analysis...", default="OFF")
 	parser.add_option("--organism", action = "store", type = "string", dest = "organism", help = "Target organism for operations...", default="OFF")
@@ -178,6 +185,16 @@ def main():
 	parser.add_option("--parameters", action = "store", type = "string", dest = "parameters", help = "MEME parameters", default="OFF")
 	parser.add_option("--background", action = "store", type = "string", dest = "background", help = "Base background frequency", default="OFF")
 	parser.add_option("--sequence", action = "store", type = "string", dest = "sequence", help = "Sequence to search for...", default="OFF")
+=======
+	parser.add_option("--organism", action = "store", type = "string", dest = "organism", help = "Target organism for operations...", default="OFF")
+	parser.add_option("--peaks", action = "store", type = "string", dest = "peaks", help = "Peaks to be used for analysis")
+	parser.add_option("--max", action = "store", type = "string", dest = "max", help = "Maximum number of peaks to consider")
+	parser.add_option("--window", action = "store", type = "string", dest = "window", help = "Window surrounding peak within which the search will be performed")
+	parser.add_option("--exclude", action = "store", type = "string", dest = "exclude", help = "Regions to remove!", default="OFF")
+	parser.add_option("--repeatMask", action = "store", type = "string", dest = "repeatMask", help = "Should repeat-masked genome be used?", default="OFF")
+	parser.add_option("--nuclear", action = "store", type = "string", dest = "nuclear", help = "Peaks are only nuclear?", default="ON")
+	parser.add_option("--parameters", action = "store", type = "string", dest = "parameters", help = "MEME parameters")
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 	parser.add_option("--threads", action = "store", type = "string", dest = "threads", help = "Multiprocessing threads", default="1")
 	parser.add_option("--chunks", action = "store", type = "int", dest = "chunks", help = "", default=100)
 	parser.add_option("--qsub", action = "store", type = "string", dest = "qsub", help = "qsub configuration header", default="OFF")
@@ -213,6 +230,7 @@ def main():
 	qsubpath = path_dict["qsub"]
 	
 	# standardize paths for analysis:
+<<<<<<< HEAD
 	if not option.mode in ["database", "measures"]:
 		peakspath = peakspath + option.peaks + "/"
 		alignerpath = bwapath
@@ -220,6 +238,14 @@ def main():
 		alignmentpath = alignerpath + "alignment/"
 		qcfilterpath = alignerpath + "qcfilter/"
 		qcmergepath = alignerpath + "qcmerge/"
+=======
+	peakspath = peakspath + option.peaks + "/"
+	alignerpath = bwapath
+	indexpath = alignerpath + "index/"
+	alignmentpath = alignerpath + "alignment/"
+	qcfilterpath = alignerpath + "qcfilter/"
+	qcmergepath = alignerpath + "qcmerge/"
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 	
 	# import configuration dictionaries:
 	source_dict = modencode.configBuild(inpath + "configure_source.txt")
@@ -258,6 +284,7 @@ def main():
 		genome_size_dict = general.build_config(genome_size_file, mode="single", separator="\t", spaceReplace=True)
 		chromosome_path = option.path + "/fasta/" + metrn.reference[organismTag]["chromosome_path"]
 	
+<<<<<<< HEAD
 	# define window and max peaks flags:
 	if not option.mode in ["database", "measures"]:
 		windowFlag = "w" + option.window
@@ -822,9 +849,118 @@ def main():
 		c_output.close()
 		print
 		
+=======
+	# load sequence dictionary:
+	if option.repeatMask == "ON":
+		# Not yet implemented!
+		#genome_dict = fasta.buildfile(genome_fastafile, options=["take.first"], append="")
+		rm_handle = "T"
+	elif option.repeatMask == "OFF":
+		#genome_dict = metrn.genomeBuilder(genome_file, chromosome_path, organism=organismTag, options=["take.first"], append="")
+		rm_handle = "F"
+	
+	# set some of the basic parameters:
+	max_peaks = int(option.max)
+	window = int(option.window)
+	
+	# prepare output folders:
+	coordpath = memepath + option.peaks + "/coord/"
+	fastapath = memepath + option.peaks + "/fasta/"
+	outputpath = memepath + option.peaks + "/output/"
+	general.pathGenerator(coordpath)
+	general.pathGenerator(fastapath)
+	general.pathGenerator(outputpath)
+		
+	# get peak call files:
+	peakfiles = os.listdir(peakspath)
+	
+	# prepare a temporary background exclusion bed file:
+	if option.exclude != "OFF":
+		
+		m_infile = memepath + option.exclude
+		m_tmpfile = memepath + option.exclude + ".tmp"
+		command = 'grep -v "feature" ' + m_infile + ' > ' + m_tmpfile
+		os.system(command)
+		
+	# extract sequences from peak calls:
+	master_dict, factors, k = dict(), list(), 0
+	print
+	print "Preparing target sequence files (FASTA):"
+	for peakfile in peakfiles:
+		if "_peaks.bed": #and ("HLH-1" in peakfile or "PHA-4" in peakfile):
+		
+			k += 1
+			print k, peakfile
+			dataset = peakfile.replace("_peaks.bed","")
+			organism, strain, factor, context, institute, method = metrn.labelComponents(dataset)
+			inputfile = peakspath + peakfile
+			coordfile = coordpath + peakfile
+			
+			# exclude genomic regions if necessary: 
+			#if option.exclude != "OFF":
+			#	
+			#	p_infile = temppath
+			#	p_outfile = macspath + "filtered/" + tempfile.replace(".bed","") + "_" + option.exclude.replace(".bed","") + "_filtered.bed"
+			#	
+			#	command = "intersectBed -v -a " + p_infile + " -b " + m_tmpfile + " > " + p_outfile
+			#	os.system(command)
+			#	
+			#	tempfile = tempfile.replace(".bed","") + "_" + option.exclude.replace(".bed","") + "_filtered.bed"
+			#	temppath = macspath + "filtered/" + tempfile
+			
+			# load peak dictionary:
+			peak_dict, signal_dict = dict(), dict()
+			inlines = open(inputfile).read().split("\n")
+			for inline in inlines:
+				if not inline == "":
+					chrm, start, end, peak, score, strand, signal, pvalue, qvalue, point = inline.strip().split("\t")
+					middle = int(start) + (int(end)-int(start))/2
+					point = int(start) + int(point)
+					if window != 0:
+						start, end = point-window, point+window
+					peak_dict[peak], signal_dict[peak] = [chrm, start, end, peak, score, strand, signal], float(signal)
+			
+			# generate target peaks file:
+			peaks = general.valuesort(signal_dict)
+			peaks.reverse()
+			c_output = open(coordfile, "w")
+			for peak in peaks[:int(option.max)]:
+				print >>c_output, "\t".join(map(str, peak_dict[peak]))
+			c_output.close()
+			
+			# create fasta file:
+			fastafile = fastapath + "memecucu_w" + option.window + "_m" + option.max + "_rm" + rm_handle + "_" + dataset + ".fasta"
+			command = "fastaFromBed -fi " + genome_file + " -bed " + coordfile + " -fo " + fastafile + " -name"
+			os.system(command)
+	
+	# remove temporary background exclusion bed file:
+	if option.exclude != "OFF":
+		command = "rm -rf " + memepath + "*.tmp"
+		os.system(command)			
+				
+	# launch motif analysis:
+	print
+	print "Executing MEME analysis:"
+	fastafiles = os.listdir(fastapath)
+	for fastafile in fastafiles:
+		if "memecucu" in fastafile and ".fasta" in fastafile:
+			command = "meme " + fastapath + fastafile + " -oc " + outputpath + fastafile.replace(".fasta","") + " " + option.parameters 
+			print command
+			os.system(command)
+			print
+	
+	
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
 if __name__ == "__main__":
 	main()
 	
 	print "Completed:", time.asctime(time.localtime())
 
+<<<<<<< HEAD
 #weblogo -f HMBOX1_DBD.dat -D transfac -o test.eps --errorbars NO --size medium --color-scheme classic
+=======
+
+#python memeCucu.py --path ~/meTRN --organism hs --peaks hs_standards_reg_cx_hct --max 250 --window 100 --repeatMask OFF --parameters "-maxsize 10000000 -nmotifs 3 -minsites 50 -maxw 12"
+#python memeCucu.py --path ~/meTRN --organism ce --peaks ce_selection_reg_cx_hct --max 250 --window 100 --repeatMask OFF --parameters "-maxsize 10000000 -nmotifs 3 -minsites 50 -maxw 12"
+#python memeCucu.py --path ~/meTRN --organism dm --peaks dm_selection_reg_cx_hct --max 250 --window 100 --repeatMask OFF --parameters "-maxsize 10000000 -nmotifs 3 -minsites 50 -maxw 12"
+>>>>>>> d32e3eeada597a7eb9b798f0ecbbaec41f50d428
