@@ -253,11 +253,11 @@
 #python mapPeaks.py --path ~/meTRN --mode build --overwrite OFF
 
 
-#coverageBed -a ~/meTRN/data/peaks/mappeaks_ce_selection_com_cx_raw_compiled.bed -b ~/meTRN/input/ensembl_ws220_nuclear_sizes.bed -hist
+#coverageBed -a /Volumes/HD1/Users/claraya/meTRN/data/peaks/mappeaks_ce_selection_com_cx_raw_compiled.bed -b /Volumes/HD1/Users/claraya/meTRN/input/ensembl_ws220_nuclear_sizes.bed -hist
 #0.2170808 (0.7829192)
-#coverageBed -a ~/meTRN/data/hot/regions/maphot_ce_selection_reg_cx_occP05_any.bed -b ~/meTRN/input/ensembl_ws220_nuclear_sizes.bed -hist
+#coverageBed -a /Volumes/HD1/Users/claraya/meTRN/data/hot/regions/maphot_ce_selection_reg_cx_occP05_any.bed -b /Volumes/HD1/Users/claraya/meTRN/input/ensembl_ws220_nuclear_sizes.bed -hist
 #0.0261704
-#coverageBed -a ~/meTRN/data/hot/regions/maphot_ce_selection_reg_cx_occP05_all.bed -b ~/meTRN/input/ensembl_ws220_nuclear_sizes.bed -hist
+#coverageBed -a /Volumes/HD1/Users/claraya/meTRN/data/hot/regions/maphot_ce_selection_reg_cx_occP05_all.bed -b /Volumes/HD1/Users/claraya/meTRN/input/ensembl_ws220_nuclear_sizes.bed -hist
 #0.005785
 
 #100*0.7829192

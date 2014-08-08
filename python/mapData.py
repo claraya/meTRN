@@ -13,8 +13,6 @@ import modencode
 import os
 
 import itertools
-import simplejson as json
-import palette
 
 print "Command:", " ".join(sys.argv)
 print "Timestamp:", time.asctime(time.localtime())
@@ -104,7 +102,9 @@ def main():
 	
 	# sunburst visualization mode:
 	if option.mode == "sunburst":
-	
+		import simplejson as json
+		import palette
+		
 		# define reports paths:
 		reportspath = reportspath + organismTag + "/"
 		general.pathGenerator(reportspath)
@@ -899,6 +899,247 @@ def main():
 		l_output.close()
 	
 		
+	# export data mode:
+	elif option.mode == "export":
+		import pandas
+		
+		# define output files:
+		exportLibs = reportspath + option.organism + "/" + "mapdata_export_" + option.peaks + "_inputs.txt"
+		exportFile = reportspath + option.organism + "/" + "mapdata_export_" + option.peaks + "_report.txt"
+		
+		print
+		print "Loading dataset report..."
+		target, source = option.library.split(":")
+		libraryData = pandas.read_table(extraspath + option.infile)
+		compareData = pandas.read_table(extraspath + option.infile.replace(target, source))
+		compareDict = dict(zip(compareData["dcc.file"].tolist(), compareData["strain"].tolist()))
+		
+		# collect DCC IDs (where available):
+		libraryData["dcc.id"] = "-"
+		for libraryInfo in libraryData.iterrows():
+			if libraryInfo[1]["dcc.status"] == "dcc.concordant" and libraryInfo[1]["dcc.file"] != "no":
+				libraryData.ix[libraryInfo[1].name, ["dcc.id"]] = compareDict[libraryInfo[1]["dcc.file"]].strip("DCC")
+			elif libraryInfo[1]["dcc.status"] == "dcc.only":
+				libraryData.ix[libraryInfo[1].name, ["dcc.id"]] = libraryInfo[1]["strain"][3:]
+			elif libraryInfo[1]["dcc.status"] == "dcc.concordant" and libraryInfo[1]["dcc.file"] == "no" and "DCC" == libraryInfo[1]["strain"][:3]:
+				libraryData.ix[libraryInfo[1].name, ["dcc.id"]] = libraryInfo[1]["strain"][3:]
+		
+		# prebuild replacement dictionary:
+		renameDict = dict()
+		for entry in option.rename.split(","):
+			target, source = entry.split(":")
+			renameDict[target] = source
+		
+		# rename target elements in names:
+		for libraryInfo in libraryData.iterrows():
+			for target in renameDict:
+				if target in libraryInfo[1]["factor"]:
+					libraryData.ix[libraryInfo[1].name, ["factor"]] = libraryInfo[1]["factor"].replace(target, renameDict[target])
+					libraryData.ix[libraryInfo[1].name, ["dataset"]] = libraryInfo[1]["dataset"].replace(target, renameDict[target])
+					
+				if "_" in target and target in libraryInfo[1]["dataset"]:
+					libraryData.ix[libraryInfo[1].name, ["dataset"]] = libraryInfo[1]["dataset"].replace(target, renameDict[target])
+					subTargets, subSources = target.split("_"), renameDict[target].split("_")
+					subnameDict = dict(zip(subTargets, subSources))
+					for subTarget in subTargets:
+						if subTarget in libraryInfo[1]["factor"]:
+							libraryData.ix[libraryInfo[1].name, ["factor"]] = libraryInfo[1]["factor"].replace(subTarget, subnameDict[subTarget])
+		
+		print "Rebuilding identifiers..."
+		libraryData["id"] = "-"
+		for libraryInfo in libraryData.iterrows():
+			libraryData.ix[libraryInfo[1].name, ["id"]] = "_".join([libraryInfo[1]["strain"], libraryInfo[1]["factor"], libraryInfo[1]["stage"], libraryInfo[1]["institute"], libraryInfo[1]["method"]])
+		
+		# assign DCC IDs (from FASTQs) to datasets:
+		k, t, m = 0, 0, 0
+		libraryData["map.id"] = "-"
+		for datasetID in libraryData["id"].unique():
+			datasetData = libraryData[libraryData["id"] == datasetID]
+			datasetIDs = sorted(list(set(general.clean(datasetData["dcc.id"].tolist(), "-"))))
+			datasetID = "-"
+			if len(datasetIDs) > 1:
+				k += 1
+			elif len(datasetIDs) == 1:
+				t += 1
+				datasetID = datasetIDs[0]
+			else:
+				m += 1
+			libraryData.ix[datasetData.index, ["map.id"]] = datasetID
+			#if datasetID == "2439" or datasetID == 2439:
+			#	print "Found!"
+			#	print libraryData.iloc[datasetData.index]
+			#	pdb.set_trace()
+				
+		print "Datasets (unique):", libraryData["id"].nunique()
+		print "DCC IDs  (unique):", libraryData["map.id"].nunique()
+		print "Datasets matched:", t
+		print "Datasets missing:", m
+		print "Datasets unclear:", k
+		print
+		
+		print "Collecting additional datasets..."
+		additionalIDs = list()
+		peakfiles = os.listdir(peakspath + option.peaks)
+		for peakfile in peakfiles:
+			datasetID = peakfile.replace("_peaks.bed", "").replace(option.organism + "_", "")
+			if not datasetID in libraryData["id"].unique().tolist():
+				additionalIDs.append(datasetID)
+				print datasetID, peakfile
+		print "Extras:", len(additionalIDs)
+		print
+		
+		def mapLibrary(x):
+			fileparts = x["url"].split("/")
+			libraryID = "_".join(map(str, [x["id"], x["replicate"], x["source"], x["instance"]]))
+			processID = libraryID + ":" + fileparts[len(fileparts)-1]
+			return processID
+		libraryData["process.id"] = libraryData.apply(mapLibrary, axis=1)
+		
+		libraryData["report"] = '-'
+		for datasetID in sorted(libraryData["id"].unique().tolist()):
+			for peakfile in peakfiles:
+				if datasetID in peakfile:
+					datasetData = libraryData[libraryData["id"] == datasetID]
+					libraryData.ix[datasetData.index, ["report"]] = "+"
+		reportData = libraryData[libraryData["report"] == "+"]
+		reportData = reportData.reset_index(drop=True)
+		print "Libraries (total):", libraryData.shape[0]
+		print "Libraries (final):", reportData.shape[0], "(" + str(round(100*float(reportData.shape[0])/libraryData.shape[0], 2)) + "%)"
+		print
+		
+		isknownData = reportData[reportData["map.id"] != "-"]
+		unknownData = reportData[reportData["map.id"] == "-"]
+		print "Datasets (final):", reportData["id"].nunique()
+		print "Datasets (w/DCC):", isknownData["id"].nunique()
+		print "Datasets (other):", unknownData["id"].nunique()
+		print
+				
+		modencodeData = pandas.read_table(extraspath + "ce_modencode_tf_binding_table.txt")
+		stageDict = {'Early Embryos':'EE', 'Embryos':'EM', 'Fed L1 stage larvae':"L1", 'L4-Young Adult larvae':"LY", 'Larvae L1 stage':"L1", 'Larvae L2 stage':"L2", 'Larvae L3 stage':"L3", 'Larvae L4 stage':"L4", 'Late Embryonic stage':"LE", 'Late Embryonic stage 4.5 hrs post-early Embryos':"LE", 'Late Embryos':"LE", 'Starved L1 stage larvae':"S1", 'Young adult':"YA", 'Young adult Day 4':"D4"}
+		modencodeDict = dict()
+		
+		modencodeData["factor"] = "unknown"
+		modencodeData["strain"] = "unknown"
+		modencodeData["stage"] = "unknown"
+		for modencodeInfo in modencodeData.iterrows():
+			factor, strain, stage, notes, technique = modencodeInfo[1]["Dataset"].split(";")
+			modencodeData.ix[modencodeInfo[1].name, ["factor"]] = factor
+			modencodeData.ix[modencodeInfo[1].name, ["strain"]] = strain
+			modencodeData.ix[modencodeInfo[1].name,  ["stage"]] = stage
+		
+		for factor in modencodeData["factor"].unique():
+			factorData = modencodeData[modencodeData["factor"] == factor]
+			for strain in factorData["strain"].unique():
+				strainData = factorData[factorData["strain"] == strain]
+				if "Fed L1 stage larvae" in strainData["stage"].tolist() and "Larvae L1 stage" in strainData["stage"].tolist():
+					print factor
+					print strainData
+		
+		stages = list()
+		modencodeDict, modencodeDCCx = dict(), dict()
+		modencodeData["factor"] = "unknown"
+		modencodeData["strain"] = "unknown"
+		modencodeData["stage"] = "unknown"
+		reportData["map.strain"] = reportData["strain"]
+		for modencodeInfo in modencodeData.iterrows():
+			factor, strain, stage, notes, technique = modencodeInfo[1]["Dataset"].split(";")
+			dccIDx = modencodeInfo[1]["ID"]
+			stages.append(stage)
+			
+			if not factor in modencodeDict:
+				modencodeDict[factor] = dict()
+			if not strain in modencodeDict[factor]:
+				modencodeDict[factor][strain] = dict()
+			if not stage in modencodeDict[factor][strain]:
+				modencodeDict[factor][strain][stage] = list()
+			modencodeDict[factor][strain][stage].append(dccIDx)
+			
+			if not factor in modencodeDCCx:
+				modencodeDCCx[factor] = dict()
+			if not dccIDx in modencodeDCCx[factor]:
+				modencodeDCCx[factor][dccIDx] = [factor, strain, stage]
+		
+		for factor in sorted(modencodeDCCx.keys()):
+			for dccIDx in sorted(modencodeDCCx[factor]):
+				factor, strain, stage = modencodeDCCx[factor][dccIDx]
+				stage = stageDict[stage]
+				pause = False
+				
+				factorData = reportData[reportData["factor"] == factor]
+				querieData = factorData[factorData["stage"] == stage]
+				querieData = querieData[querieData["method"] == "stn"]
+				if querieData["strain"].nunique() != 1 and strain in querieData["strain"].unique().tolist():
+					querieData = querieData[querieData["strain"] == strain]
+				elif "DCC" + dccIDx in querieData["strain"].unique().tolist():
+					querieData = querieData[querieData["strain"] == "DCC" + dccIDx]
+				elif dccIDx in querieData["map.id"].unique().tolist():
+					querieData = querieData[querieData["map.id"] == dccIDx]
+				
+				print factor, strain, stage, dccIDx
+				print querieData
+				
+				if querieData.shape[0] != 0:
+					strainError, dccIDxError = False, False
+					
+					if querieData["strain"].nunique() == 1 and querieData["strain"].unique().tolist()[0] == strain:
+						print "strain-correct"
+					elif querieData["strain"].unique().tolist()[0] == "DCC" + dccIDx:
+						reportData.ix[querieData.index, ["map.strain"]] = strain
+						print reportData.iloc[querieData.index][["id", "dcc.id", "map.id", "strain", "map.strain"]]
+						print "strain-adjust"
+					else:
+						strainError = "strain-fail"
+					
+					if querieData["map.id"].nunique() == 1 and querieData["map.id"].unique().tolist()[0] == "-":
+						if querieData["strain"].nunique() == 1 and querieData["strain"].unique()[0] == strain:
+							reportData.ix[querieData.index, ["map.id"]] = dccIDx
+							print reportData.iloc[querieData.index][["id", "dcc.id", "map.id", "strain", "map.strain"]]
+							print "dccID-adjust"
+						else:
+							dccIDxError = "dccID-missing"
+							
+					if strainError or dccIDxError:
+						print strainError, dccIDxError
+						#pdb.set_trace()
+					
+				else:
+					print "skipped..."
+				print
+				
+			
+		#'L1', , 'L2', 'L3', 'L4', 'LE', 'YA', , 'LY', 'S1', 'D4'
+		print "done!"
+		print
+		
+		reviewList = list()
+		for datasetID in sorted(reportData["id"].unique().tolist()) + additionalIDs:
+			xtrain, factor, stage, institute, method = datasetID.split("_")
+			
+			if datasetID in reportData["id"].unique().tolist():
+				datasetData = reportData[reportData["id"] == datasetID]
+				files = ",".join(datasetData["process.id"].tolist())
+				replicates = datasetData["replicate"].max()
+				dccIDs = ",".join(sorted(datasetData["map.id"].unique().tolist()))
+				if datasetData["map.strain"].nunique() == 1:
+					strain = datasetData["map.strain"].unique().tolist()[0]
+				else:
+					print "Error!"
+					pdb.set_trace()
+			else:
+				files = "-"
+				replicates = "-"
+				dccIDs = "-"
+				strain = xtrain
+			reviewList.append([strain, factor, stage, institute, method, replicates, dccIDs, files])
+		reviewData = pandas.DataFrame.from_records(reviewList)
+		reviewData.columns = ["strain", "factor", "context", "institute", "method", "replicates", "dcc.id", "sources"]
+		
+		reportData.to_csv(exportLibs, sep="\t", index=False)
+		reviewData.to_csv(exportFile, sep="\t", index=False)
+		pdb.set_trace()
+		
+		#python mapData.py --path ~/meTRN/ --mode export --organism ce --source extras --infile cetrn/configure_final_complete.txt --library final:modencode --peaks ce_reporting_com_xx_raw --rename POL2:AMA-1,POLIII:RPC-1,C01312.1:C01G12.1,R0GF6.6:R06F6.6,RPC-15:RPC-1,DCC4640_LIN-35:DCC4640_EFL-1,HAM-1:MEP-1,CEH-28:CEH-38
+		
 	# waterston new genes mode:
 	elif option.mode == "waterston":
 	
@@ -952,6 +1193,5 @@ if __name__ == "__main__":
 #python mapData.py --path ~/meTRN/ --mode scanner --peaks ce_selection_com_l3_raw
 #python mapData.py --path ~/meTRN/ --mode scanner --peaks ce_selection_com_l4_raw
 #python mapData.py --path ~/meTRN/ --mode scanner --peaks ce_selection_com_cx_raw
-
 
 

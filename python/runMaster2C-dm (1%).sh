@@ -155,11 +155,11 @@
 #python mapPeaks.py --path ~/meTRN --mode build --overwrite OFF
 
 
-#coverageBed -a ~/meTRN/data/peaks/mappeaks_dm_selection_com_cx_raw_compiled.bed -b ~/meTRN/input/flybase_dmel_r5-32_nuclear_sizes.bed -hist
+#coverageBed -a /Volumes/HD1/Users/claraya/meTRN/data/peaks/mappeaks_dm_selection_com_cx_raw_compiled.bed -b /Volumes/HD1/Users/claraya/meTRN/input/flybase_dmel_r5-32_nuclear_sizes.bed -hist
 #0.199868 (0.800132)
-#coverageBed -a ~/meTRN/data/hot/regions/maphot_dm_selection_reg_cx_occP01_any.bed -b ~/meTRN/input/flybase_dmel_r5-32_nuclear_sizes.bed -hist
+#coverageBed -a /Volumes/HD1/Users/claraya/meTRN/data/hot/regions/maphot_dm_selection_reg_cx_occP01_any.bed -b /Volumes/HD1/Users/claraya/meTRN/input/flybase_dmel_r5-32_nuclear_sizes.bed -hist
 #0.0029082
-#coverageBed -a ~/meTRN/data/hot/regions/maphot_dm_selection_reg_cx_occP01_all.bed -b ~/meTRN/input/flybase_dmel_r5-32_nuclear_sizes.bed -hist
+#coverageBed -a /Volumes/HD1/Users/claraya/meTRN/data/hot/regions/maphot_dm_selection_reg_cx_occP01_all.bed -b /Volumes/HD1/Users/claraya/meTRN/input/flybase_dmel_r5-32_nuclear_sizes.bed -hist
 #0.0000692
 
 #100*0.199868
